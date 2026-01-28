@@ -94,6 +94,9 @@
 	:global(.milkdown) {
 		padding: 1rem;
 		outline: none;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		white-space: pre-wrap;
 	}
 
 	:global(.milkdown .editor) {
