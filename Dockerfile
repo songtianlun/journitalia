@@ -41,8 +41,11 @@ RUN apk --no-cache add ca-certificates tzdata
 # Copy binary from backend builder (frontend is already embedded in the binary)
 COPY --from=backend-builder /app/diaria /app/diaria
 
-# Create pb_data directory
-RUN mkdir -p /app/pb_data
+# Create data directory
+RUN mkdir -p /app/data
+
+# Set default data directory environment variable
+ENV DIARIA_DATA_PATH=/app/data
 
 # Expose port
 EXPOSE 8090

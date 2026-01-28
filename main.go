@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -19,6 +20,17 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/spf13/cobra"
 )
+
+// getDataDir returns the data directory path
+// Priority: command line flag > environment variable > default value
+func getDataDir() string {
+	// Check environment variable first
+	if dataDir := os.Getenv("DIARIA_DATA_PATH"); dataDir != "" {
+		return dataDir
+	}
+	// Default value
+	return "./pb_data"
+}
 
 // serveSPA serves the SPA with fallback to index.html for client-side routing
 func serveSPA(c echo.Context, fsys fs.FS) error {
@@ -89,7 +101,21 @@ func serveSPA(c echo.Context, fsys fs.FS) error {
 }
 
 func main() {
-	app := pocketbase.New()
+	// Get data directory from environment or default
+	defaultDataDir := getDataDir()
+
+	app := pocketbase.NewWithConfig(pocketbase.Config{
+		DefaultDataDir: defaultDataDir,
+	})
+
+	// Add data-dir flag to serve command
+	var dataDirFlag string
+	app.RootCmd.PersistentFlags().StringVar(
+		&dataDirFlag,
+		"data-dir",
+		defaultDataDir,
+		"the directory to store application data",
+	)
 
 	// Register migrations
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
@@ -107,6 +133,14 @@ func main() {
 
 	// Register custom routes and serve embedded frontend
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		// Print data directory information
+		absDataDir, err := filepath.Abs(app.DataDir())
+		if err != nil {
+			log.Printf("Data directory: %s", app.DataDir())
+		} else {
+			log.Printf("Data directory: %s", absDataDir)
+		}
+
 		// Register API routes
 		api.RegisterDiaryRoutes(app, e)
 
