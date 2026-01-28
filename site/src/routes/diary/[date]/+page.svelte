@@ -19,7 +19,8 @@
 		updateLocalCache,
 		updateFromServer,
 		getCachedContent,
-		forceSyncNow
+		forceSyncNow,
+		hasDirtyCache
 	} from '$lib/stores/diaryCache';
 
 	let content = '';
@@ -29,9 +30,9 @@
 	$: date = $page.params.date;
 	$: canGoNext = !isToday(date);
 
-	// Subscribe to sync state for UI updates
-	$: saving = $syncState.isSyncing;
-	$: saveStatus = $syncState.message;
+	// Reactive sync status for current date
+	$: currentDateIsDirty = date ? $diaryCache[date]?.isDirty || false : false;
+	$: isSyncingCurrentDate = $syncState.isSyncing && $syncState.currentDate === date;
 
 	// Navigation - use current page params directly
 	function goToPreviousDay() {
@@ -220,17 +221,25 @@
 
 				<!-- Actions -->
 				<div class="flex items-center gap-3">
-					{#if saveStatus}
-						<span
-							class="text-sm {$syncState.status === 'saved'
-								? 'text-green-600'
-								: $syncState.status === 'saving'
-									? 'text-gray-500'
-									: 'text-red-600'}"
-						>
-							{saveStatus}
-						</span>
-					{/if}
+					<!-- Sync Status Icon -->
+					<div class="flex items-center" title={isSyncingCurrentDate ? 'Syncing...' : currentDateIsDirty ? 'Unsaved changes' : 'Synced'}>
+						{#if isSyncingCurrentDate}
+							<!-- Syncing: spinning ring -->
+							<svg class="w-5 h-5 text-yellow-500 animate-spin" fill="none" viewBox="0 0 24 24">
+								<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="40 20" stroke-linecap="round"></circle>
+							</svg>
+						{:else if currentDateIsDirty}
+							<!-- Dirty: pencil edit icon -->
+							<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+							</svg>
+						{:else}
+							<!-- Synced: cloud check -->
+							<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+							</svg>
+						{/if}
+					</div>
 
 					{#if !isToday(date)}
 						<button
