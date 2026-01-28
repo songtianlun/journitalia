@@ -6,7 +6,9 @@ import (
 
 	"github.com/songtianlun/diaria/internal/api"
 	_ "github.com/songtianlun/diaria/internal/migrations"
+	"github.com/songtianlun/diaria/internal/static"
 
+	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
@@ -30,9 +32,21 @@ func main() {
 		},
 	})
 
-	// Register custom routes
+	// Register custom routes and serve embedded frontend
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		// Register API routes
 		api.RegisterDiaryRoutes(app, e)
+
+		// Serve embedded frontend static files
+		staticFS, err := static.GetFS()
+		if err != nil {
+			log.Printf("Warning: Failed to get embedded static files: %v", err)
+		} else {
+			// Serve static files from embedded FS
+			// Use a catch-all route for SPA support
+			e.Router.GET("/*", echo.StaticDirectoryHandler(staticFS, false))
+		}
+
 		return nil
 	})
 

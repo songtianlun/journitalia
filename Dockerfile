@@ -20,6 +20,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+# Copy frontend build from frontend builder stage to embed location
+COPY --from=frontend-builder /app/site/build ./internal/static/build
+
 # Get version from build arg or git
 ARG VERSION
 RUN if [ -z "$VERSION" ]; then \
@@ -35,11 +38,8 @@ WORKDIR /app
 # Install ca-certificates for HTTPS
 RUN apk --no-cache add ca-certificates tzdata
 
-# Copy binary from backend builder
+# Copy binary from backend builder (frontend is already embedded in the binary)
 COPY --from=backend-builder /app/diaria /app/diaria
-
-# Copy frontend build from frontend builder
-COPY --from=frontend-builder /app/site/build /app/site/build
 
 # Create pb_data directory
 RUN mkdir -p /app/pb_data

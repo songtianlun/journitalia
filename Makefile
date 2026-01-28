@@ -30,7 +30,10 @@ frontend:
 	cd site && npm install && npm run build
 
 # Build backend
-backend:
+backend: frontend
+	@echo "Copying frontend build to embed location..."
+	@mkdir -p internal/static/build
+	@cp -r site/build/* internal/static/build/
 	@echo "Building backend with version $(VERSION)..."
 	go build -ldflags "$(LDFLAGS)" -o diaria .
 
