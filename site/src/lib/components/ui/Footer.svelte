@@ -41,7 +41,7 @@
 				<span>© {new Date().getFullYear()} Diaria</span>
 				{#if version}
 					<span class="text-border">·</span>
-					<span class="font-mono text-[10px] px-1.5 py-0.5 bg-muted/50 rounded">{version}</span>
+					<span class="font-mono text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary/80 dark:bg-primary/15 dark:text-primary/90 rounded border border-primary/20">{version}</span>
 				{/if}
 			</div>
 			<ThemeToggle />
