@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { getToday } from '$lib/utils/date';
 
 	onMount(() => {
-		// Redirect to today's diary
-		const today = new Date().toISOString().split('T')[0];
-		goto(`/diary/${today}`);
+		// Redirect to today's diary (using local timezone)
+		goto(`/diary/${getToday()}`);
 	});
 </script>
 
