@@ -82,6 +82,18 @@ export const getSuggestionItems = (query: string): CommandItem[] => {
 			},
 		},
 		{
+			title: 'Image',
+			description: 'Upload image',
+			icon: 'image',
+			group: 'INSERT',
+			command: ({ editor, range }) => {
+				editor.chain().focus().deleteRange(range).run();
+				if (imageUploadTrigger) {
+					imageUploadTrigger();
+				}
+			},
+		},
+		{
 			title: 'Quote',
 			description: 'Blockquote',
 			icon: 'quote',
@@ -106,18 +118,6 @@ export const getSuggestionItems = (query: string): CommandItem[] => {
 			group: 'INSERT',
 			command: ({ editor, range }) => {
 				editor.chain().focus().deleteRange(range).setHorizontalRule().run();
-			},
-		},
-		{
-			title: 'Image',
-			description: 'Upload image',
-			icon: 'image',
-			group: 'INSERT',
-			command: ({ editor, range }) => {
-				editor.chain().focus().deleteRange(range).run();
-				if (imageUploadTrigger) {
-					imageUploadTrigger();
-				}
 			},
 		},
 	];
