@@ -89,6 +89,26 @@ export async function getDatesWithDiaries(start: string, end: string): Promise<s
 }
 
 /**
+ * Get recent diaries
+ */
+export async function getRecentDiaries(limit: number = 5): Promise<Array<{ date: string; content: string }>> {
+	try {
+		const records = await pb.collection('diaries').getList(1, limit, {
+			sort: '-date',
+			fields: 'date,content'
+		});
+
+		return records.items.map((item: any) => ({
+			date: item.date.split(' ')[0],
+			content: item.content || ''
+		}));
+	} catch (error) {
+		console.error('Error fetching recent diaries:', error);
+		return [];
+	}
+}
+
+/**
  * Search diaries
  */
 export async function searchDiaries(query: string) {
@@ -108,6 +128,36 @@ export async function searchDiaries(query: string) {
 	} catch (error) {
 		console.error('Error searching diaries:', error);
 		return [];
+	}
+}
+
+/**
+ * Get diary stats (streak and total)
+ */
+export async function getDiaryStats(): Promise<{ streak: number; total: number }> {
+	try {
+		// Get user's timezone
+		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		const url = `/api/diaries/stats?tz=${encodeURIComponent(tz)}`;
+
+		const response = await fetch(url, {
+			headers: {
+				'Authorization': `Bearer ${pb.authStore.token}`
+			}
+		});
+
+		if (!response.ok) {
+			return { streak: 0, total: 0 };
+		}
+
+		const data = await response.json();
+		return {
+			streak: data.streak || 0,
+			total: data.total || 0
+		};
+	} catch (error) {
+		console.error('Error fetching diary stats:', error);
+		return { streak: 0, total: 0 };
 	}
 }
 
