@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Calendar from '$lib/components/calendar/Calendar.svelte';
 	import Footer from '$lib/components/ui/Footer.svelte';
-	import { getDatesWithDiaries, getRecentDiaries } from '$lib/api/diaries';
+	import { getDatesWithDiaries, getRecentDiaries, getDiaryStats } from '$lib/api/diaries';
 	import { isAuthenticated } from '$lib/api/client';
 	import { getMonthRange, formatDisplayDate } from '$lib/utils/date';
 
@@ -11,8 +11,10 @@
 	let currentMonth = new Date().getMonth() + 1;
 	let datesWithDiaries: string[] = [];
 	let recentDiaries: Array<{ date: string; content: string }> = [];
+	let stats: { streak: number; total: number } | null = null;
 	let loading = true;
 	let recentLoading = true;
+	let statsLoading = true;
 
 	async function loadDatesWithDiaries() {
 		loading = true;
@@ -31,6 +33,12 @@
 		recentLoading = false;
 	}
 
+	async function loadStats() {
+		statsLoading = true;
+		stats = await getDiaryStats();
+		statsLoading = false;
+	}
+
 	function getPreview(content: string): string {
 		const text = content.replace(/<[^>]*>/g, '').trim();
 		return text.length > 80 ? text.slice(0, 80) + '...' : text;
@@ -43,6 +51,7 @@
 		}
 		loadDatesWithDiaries();
 		loadRecentDiaries();
+		loadStats();
 	});
 
 	$: {
@@ -126,18 +135,34 @@
 					<div class="bg-card rounded-xl shadow-sm border border-border/50 p-4 animate-fade-in" style="animation-delay: 100ms">
 						<div class="text-xs text-muted-foreground">This month</div>
 						<div class="text-xl font-bold text-foreground mt-1">
-							{datesWithDiaries.length}
+							{#if loading}
+								<span class="inline-block w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+							{:else}
+								{datesWithDiaries.length}
+							{/if}
 						</div>
 					</div>
 
 					<div class="bg-card rounded-xl shadow-sm border border-border/50 p-4 animate-fade-in" style="animation-delay: 150ms">
 						<div class="text-xs text-muted-foreground">Streak</div>
-						<div class="text-xl font-bold text-foreground mt-1">-</div>
+						<div class="text-xl font-bold text-foreground mt-1">
+							{#if statsLoading}
+								<span class="inline-block w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+							{:else}
+								{stats?.streak ?? 0}
+							{/if}
+						</div>
 					</div>
 
 					<div class="bg-card rounded-xl shadow-sm border border-border/50 p-4 animate-fade-in" style="animation-delay: 200ms">
 						<div class="text-xs text-muted-foreground">Total</div>
-						<div class="text-xl font-bold text-foreground mt-1">-</div>
+						<div class="text-xl font-bold text-foreground mt-1">
+							{#if statsLoading}
+								<span class="inline-block w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+							{:else}
+								{stats?.total ?? 0}
+							{/if}
+						</div>
 					</div>
 				</div>
 

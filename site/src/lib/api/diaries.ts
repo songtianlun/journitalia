@@ -132,6 +132,36 @@ export async function searchDiaries(query: string) {
 }
 
 /**
+ * Get diary stats (streak and total)
+ */
+export async function getDiaryStats(): Promise<{ streak: number; total: number }> {
+	try {
+		// Get user's timezone
+		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		const url = `/api/diaries/stats?tz=${encodeURIComponent(tz)}`;
+
+		const response = await fetch(url, {
+			headers: {
+				'Authorization': `Bearer ${pb.authStore.token}`
+			}
+		});
+
+		if (!response.ok) {
+			return { streak: 0, total: 0 };
+		}
+
+		const data = await response.json();
+		return {
+			streak: data.streak || 0,
+			total: data.total || 0
+		};
+	} catch (error) {
+		console.error('Error fetching diary stats:', error);
+		return { streak: 0, total: 0 };
+	}
+}
+
+/**
  * Delete diary
  */
 export async function deleteDiary(id: string): Promise<boolean> {

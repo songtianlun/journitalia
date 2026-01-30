@@ -121,6 +121,91 @@ func RegisterDiaryRoutes(app *pocketbase.PocketBase, e *core.ServeEvent) {
 		})
 	}, apis.ActivityLogger(app), apis.RequireRecordAuth())
 
+	// Get diary stats (streak and total)
+	e.Router.GET("/api/diaries/stats", func(c echo.Context) error {
+		// Get authenticated user
+		authRecord, _ := c.Get(apis.ContextAuthRecordKey).(*models.Record)
+		if authRecord == nil {
+			return apis.NewUnauthorizedError("The request requires valid authorization token.", nil)
+		}
+
+		userId := authRecord.Id
+
+		// Get timezone from query param, default to UTC
+		tz := c.QueryParam("tz")
+		loc := time.UTC
+		if tz != "" {
+			if parsedLoc, err := time.LoadLocation(tz); err == nil {
+				loc = parsedLoc
+			}
+		}
+
+		// Get total count using COUNT query for better performance
+		var total int
+		err := app.Dao().DB().
+			NewQuery("SELECT COUNT(*) FROM diaries WHERE owner = {:owner}").
+			Bind(map[string]any{"owner": userId}).
+			Row(&total)
+		if err != nil {
+			total = 0
+		}
+
+		// Calculate streak - only fetch recent records (last 365 days max)
+		streak := 0
+		now := time.Now().In(loc)
+		today := now.Format("2006-01-02")
+		oneYearAgo := now.AddDate(-1, 0, 0).Format("2006-01-02")
+
+		records, err := app.Dao().FindRecordsByFilter(
+			"diaries",
+			"owner = {:owner} && date >= {:start}",
+			"-date",
+			365,
+			0,
+			map[string]any{
+				"owner": userId,
+				"start": oneYearAgo + " 00:00:00.000Z",
+			},
+		)
+
+		if err == nil && len(records) > 0 {
+			// Create a set of dates for quick lookup
+			dateSet := make(map[string]bool)
+			for _, record := range records {
+				dateTime := record.GetString("date")
+				if len(dateTime) >= 10 {
+					dateSet[dateTime[:10]] = true
+				}
+			}
+
+			// Start counting from today or yesterday
+			yesterday := now.AddDate(0, 0, -1).Format("2006-01-02")
+			var checkDate time.Time
+			if dateSet[today] {
+				checkDate = now
+			} else if dateSet[yesterday] {
+				checkDate = now.AddDate(0, 0, -1)
+			}
+
+			if !checkDate.IsZero() {
+				for {
+					dateStr := checkDate.Format("2006-01-02")
+					if dateSet[dateStr] {
+						streak++
+						checkDate = checkDate.AddDate(0, 0, -1)
+					} else {
+						break
+					}
+				}
+			}
+		}
+
+		return c.JSON(http.StatusOK, map[string]any{
+			"total":  total,
+			"streak": streak,
+		})
+	}, apis.ActivityLogger(app), apis.RequireRecordAuth())
+
 	// Search diaries
 	e.Router.GET("/api/diaries/search", func(c echo.Context) error {
 		query := c.QueryParam("q")
