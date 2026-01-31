@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Footer from '$lib/components/ui/Footer.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 	import { searchDiaries } from '$lib/api/diaries';
 	import { isAuthenticated } from '$lib/api/client';
 	import { formatDisplayDate, formatShortDate, getDayOfWeek } from '$lib/utils/date';
@@ -102,32 +103,10 @@
 </svelte:head>
 
 <div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="glass border-b border-border/50 sticky top-0 z-20">
-		<div class="max-w-3xl mx-auto px-4 h-11">
-			<div class="flex items-center justify-between h-full">
-				<a href="/" class="text-lg font-semibold text-foreground hover:text-primary transition-colors">
-					Journitalia
-				</a>
-
-				<div class="flex items-center gap-2">
-					<a
-						href="/diary"
-						class="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200"
-						title="Back to Calendar"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-						</svg>
-					</a>
-				</div>
-			</div>
-		</div>
-	</header>
+	<PageHeader title="Search" />
 
 	<!-- Main Content -->
-	<main class="max-w-3xl mx-auto px-4 py-8">
+	<main class="max-w-4xl mx-auto px-4 py-8">
 		<!-- Search Header -->
 		<div class="mb-8 animate-fade-in">
 			<h1 class="text-2xl font-bold text-foreground mb-2">Search Diaries</h1>
@@ -251,7 +230,7 @@
 	</main>
 
 	<!-- Footer -->
-	<Footer maxWidth="3xl" tagline="Search through your memories" />
+	<Footer maxWidth="4xl" tagline="Search through your memories" />
 </div>
 
 <style>

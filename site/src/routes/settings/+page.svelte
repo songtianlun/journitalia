@@ -4,6 +4,7 @@
 	import { isAuthenticated } from '$lib/api/client';
 	import { getApiToken, toggleApiToken, resetApiToken, type ApiTokenStatus } from '$lib/api/settings';
 	import { getAISettings, saveAISettings, fetchModels, buildVectors, buildVectorsIncremental, getVectorStats, type AISettings, type ModelInfo, type BuildVectorsResult, type VectorStats } from '$lib/api/ai';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 
 	let loading = true;
 	let tokenStatus: ApiTokenStatus = { exists: false, enabled: false, token: '' };
@@ -190,21 +191,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="glass border-b border-border/50 sticky top-0 z-20">
-		<div class="max-w-4xl mx-auto px-4 h-11">
-			<div class="flex items-center justify-between h-full">
-				<div class="flex items-center gap-3">
-					<a href="/diary" class="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200" title="Back">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-						</svg>
-					</a>
-					<span class="text-lg font-semibold text-foreground">Settings</span>
-				</div>
-			</div>
-		</div>
-	</header>
+	<PageHeader title="Settings" />
 
 	<!-- Main Content -->
 	<main class="max-w-4xl mx-auto px-4 py-6">

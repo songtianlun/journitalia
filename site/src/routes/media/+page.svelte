@@ -4,6 +4,7 @@
 	import { isAuthenticated } from '$lib/api/client';
 	import { getAllMedia, getMediaFileUrl, deleteMediaById, type MediaWithDiary } from '$lib/api/media';
 	import Footer from '$lib/components/ui/Footer.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 
 	let mediaList: MediaWithDiary[] = [];
 	let loading = true;
@@ -102,27 +103,10 @@
 </svelte:head>
 
 <div class="min-h-screen bg-background">
-	<!-- Header -->
-	<header class="glass border-b border-border/50 sticky top-0 z-20">
-		<div class="max-w-6xl mx-auto px-4 h-11">
-			<div class="flex items-center justify-between h-full">
-				<div class="flex items-center gap-3">
-					<a href="/diary" class="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200" title="Back">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-						</svg>
-					</a>
-					<span class="text-lg font-semibold text-foreground">Media Library</span>
-					{#if !loading}
-						<span class="text-sm text-muted-foreground">({totalItems})</span>
-					{/if}
-				</div>
-			</div>
-		</div>
-	</header>
+	<PageHeader title="Media Library" subtitle={!loading ? `(${totalItems})` : ''} />
 
 	<!-- Main Content -->
-	<main class="max-w-6xl mx-auto px-4 py-6">
+	<main class="max-w-4xl mx-auto px-4 py-6">
 		{#if loading}
 			<div class="flex flex-col items-center justify-center py-20 gap-3">
 				<svg class="w-6 h-6 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
@@ -206,7 +190,7 @@
 		{/if}
 	</main>
 
-	<Footer maxWidth="6xl" tagline="Your media library" />
+	<Footer maxWidth="4xl" tagline="Your media library" />
 </div>
 
 <!-- Media Detail Modal -->
