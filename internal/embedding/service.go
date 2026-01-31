@@ -91,6 +91,13 @@ func (s *EmbeddingService) createEmbeddingFunc(userID string) (chromem.Embedding
 	// Normalize base URL
 	baseURL = strings.TrimSuffix(baseURL, "/")
 
+	// Debug log configuration (mask API key)
+	maskedKey := "***"
+	if len(apiKey) > 8 {
+		maskedKey = apiKey[:4] + "***" + apiKey[len(apiKey)-4:]
+	}
+	logger.Debug("[EmbeddingService] config: baseURL=%s, model=%s, apiKey=%s", baseURL, embeddingModel, maskedKey)
+
 	return func(ctx context.Context, text string) ([]float32, error) {
 		return s.generateEmbedding(ctx, baseURL, apiKey, embeddingModel, text)
 	}, nil
@@ -127,6 +134,7 @@ func (s *EmbeddingService) generateEmbedding(ctx context.Context, baseURL, apiKe
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		logger.Error("[EmbeddingService] embedding API error: status=%d, url=%s, response=%s", resp.StatusCode, url, string(body))
 		return nil, fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(body))
 	}
 
