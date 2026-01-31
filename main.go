@@ -224,45 +224,6 @@ func main() {
 			return nil
 		})
 
-		// Start scheduled vector build task (runs every 6 hours)
-		if embeddingService != nil {
-			go func() {
-				ticker := time.NewTicker(6 * time.Hour)
-				defer ticker.Stop()
-
-				for range ticker.C {
-					logger.Info("[VectorScheduler] starting scheduled vector build")
-
-					users, err := app.Dao().FindRecordsByFilter("users", "", "", -1, 0, nil)
-					if err != nil {
-						logger.Error("[VectorScheduler] failed to fetch users: %v", err)
-						continue
-					}
-
-					for _, user := range users {
-						userID := user.GetId()
-						enabled, _ := configService.GetBool(userID, "ai.enabled")
-						if !enabled {
-							continue
-						}
-
-						ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-						result, err := embeddingService.BuildIncrementalVectors(ctx, userID)
-						cancel()
-
-						if err != nil {
-							logger.Error("[VectorScheduler] failed for user %s: %v", userID, err)
-							continue
-						}
-						logger.Info("[VectorScheduler] completed for user %s: %d built, %d failed", userID, result.Success, result.Failed)
-					}
-
-					logger.Info("[VectorScheduler] scheduled vector build completed")
-				}
-			}()
-			logger.Info("[VectorScheduler] started, will run every 6 hours")
-		}
-
 		// Register API routes
 		api.RegisterDiaryRoutes(app, e)
 		api.RegisterSettingsRoutes(app, e)
