@@ -7,7 +7,7 @@ COPY site/ ./
 RUN npm run build
 
 # Build stage for backend
-FROM golang:1.22-alpine AS backend-builder
+FROM golang:1.23-alpine AS backend-builder
 WORKDIR /app
 
 # Install git for version detection
