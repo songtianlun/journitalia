@@ -69,6 +69,15 @@ func (v *VectorDB) DeleteCollection(userID string) error {
 	return v.db.DeleteCollection(collName)
 }
 
+// GetCollection gets a collection for a user (read-only, no embedding func needed for Count)
+func (v *VectorDB) GetCollection(userID string) *chromem.Collection {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+
+	collName := fmt.Sprintf("%s_%s", collectionName, userID)
+	return v.db.GetCollection(collName, nil)
+}
+
 // Close closes the vector database
 func (v *VectorDB) Close() error {
 	// chromem-go doesn't have a Close method, but we keep this for future compatibility

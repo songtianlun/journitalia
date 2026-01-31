@@ -23,6 +23,13 @@ export interface BuildVectorsResult {
 	error_details?: string[];
 }
 
+export interface VectorStats {
+	diary_count: number;
+	indexed_count: number;
+	outdated_count: number;
+	pending_count: number;
+}
+
 /**
  * Get AI settings
  */
@@ -98,7 +105,7 @@ export async function fetchModels(apiKey: string, baseUrl: string): Promise<Mode
 }
 
 /**
- * Build vectors for all diaries
+ * Build vectors for all diaries (full rebuild)
  */
 export async function buildVectors(): Promise<BuildVectorsResult> {
 	const response = await fetch('/api/ai/vectors/build', {
@@ -112,6 +119,44 @@ export async function buildVectors(): Promise<BuildVectorsResult> {
 	if (!response.ok) {
 		const data = await response.json();
 		throw new Error(data.message || 'Failed to build vectors');
+	}
+
+	return await response.json();
+}
+
+/**
+ * Build vectors incrementally (only new and outdated)
+ */
+export async function buildVectorsIncremental(): Promise<BuildVectorsResult> {
+	const response = await fetch('/api/ai/vectors/build-incremental', {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${pb.authStore.token}`,
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		const data = await response.json();
+		throw new Error(data.message || 'Failed to build vectors');
+	}
+
+	return await response.json();
+}
+
+/**
+ * Get vector stats
+ */
+export async function getVectorStats(): Promise<VectorStats> {
+	const response = await fetch('/api/ai/vectors/stats', {
+		headers: {
+			'Authorization': `Bearer ${pb.authStore.token}`
+		}
+	});
+
+	if (!response.ok) {
+		const data = await response.json();
+		throw new Error(data.message || 'Failed to get vector stats');
 	}
 
 	return await response.json();
