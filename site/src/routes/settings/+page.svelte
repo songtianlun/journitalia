@@ -219,7 +219,7 @@
 </script>
 
 <svelte:head>
-	<title>Settings - Journitalia</title>
+	<title>Settings - Diarum</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">

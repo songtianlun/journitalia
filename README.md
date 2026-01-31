@@ -1,4 +1,4 @@
-# Journitalia
+# Diarum
 
 [English](#english) | [中文](#中文)
 
@@ -8,7 +8,7 @@
 
 ### About
 
-**Journitalia** (Chinese: 吾身) - A simple, elegant, and self-hosted diary application built with PocketBase and modern web technologies.
+**Diarum** (Chinese: 吾身) - A simple, elegant, and self-hosted diary application built with PocketBase and modern web technologies.
 
 ### Features
 
@@ -25,9 +25,9 @@
 
 ```bash
 docker run -d \
-  --name journitalia \
+  --name diarum \
   -p 8090:8090 \
-  songtianlun/journitalia:latest
+  songtianlun/diarum:latest
 ```
 
 Access the application at `http://localhost:8090`
@@ -38,10 +38,10 @@ To persist your diary data, mount a volume to the data directory:
 
 ```bash
 docker run -d \
-  --name journitalia \
+  --name diarum \
   -p 8090:8090 \
   -v /path/to/your/data:/app/data \
-  songtianlun/journitalia:latest
+  songtianlun/diarum:latest
 ```
 
 #### Using Docker Compose
@@ -52,15 +52,15 @@ Create a `docker-compose.yml` file:
 version: '3.8'
 
 services:
-  journitalia:
-    image: songtianlun/journitalia:latest
-    container_name: journitalia
+  diarum:
+    image: songtianlun/diarum:latest
+    container_name: diarum
     ports:
       - "8090:8090"
     volumes:
       - ./data:/app/data
     environment:
-      - JOURNITALIA_DATA_PATH=/app/data
+      - DIARUM_DATA_PATH=/app/data
     restart: unless-stopped
 ```
 
@@ -78,20 +78,20 @@ You can configure the data directory in three ways (in order of priority):
 
 1. **Command Line Flag**:
    ```bash
-   ./journitalia serve --data-dir=/custom/path
+   ./diarum serve --data-dir=/custom/path
    ```
 
 2. **Environment Variable**:
    ```bash
-   export JOURNITALIA_DATA_PATH=/custom/path
-   ./journitalia serve
+   export DIARUM_DATA_PATH=/custom/path
+   ./diarum serve
    ```
 
 3. **Default**: `./pb_data` (current directory)
 
 #### Docker Environment Variables
 
-- `JOURNITALIA_DATA_PATH`: Set the data directory path (default: `/app/data`)
+- `DIARUM_DATA_PATH`: Set the data directory path (default: `/app/data`)
 
 ### Building from Source
 
@@ -104,8 +104,8 @@ You can configure the data directory in three ways (in order of priority):
 
 ```bash
 # Clone the repository
-git clone https://github.com/songtianlun/journitalia.git
-cd journitalia
+git clone https://github.com/songtianlun/diarum.git
+cd diarum
 
 # Build frontend
 cd site
@@ -114,17 +114,17 @@ npm run build
 cd ..
 
 # Build backend
-go build -o journitalia .
+go build -o diarum .
 
 # Run
-./journitalia serve
+./diarum serve
 ```
 
 Or use the Makefile:
 
 ```bash
 make build
-./journitalia serve
+./diarum serve
 ```
 
 ### Development
@@ -154,7 +154,7 @@ Access the PocketBase admin panel at `http://localhost:8090/_/` to:
 
 ### 关于
 
-**吾身** (Journitalia) - 取自"吾日三省吾身"，一款帮助你反思、复盘、总结的日记应用，记录独一无二的人生。
+**吾身** (Diarum) - 取自"吾日三省吾身"，一款帮助你反思、复盘、总结的日记应用，记录独一无二的人生。
 
 基于 PocketBase 和现代 Web 技术构建，简洁、优雅、可自托管。
 
@@ -173,9 +173,9 @@ Access the PocketBase admin panel at `http://localhost:8090/_/` to:
 
 ```bash
 docker run -d \
-  --name journitalia \
+  --name diarum \
   -p 8090:8090 \
-  songtianlun/journitalia:latest
+  songtianlun/diarum:latest
 ```
 
 在浏览器访问 `http://localhost:8090`
@@ -186,10 +186,10 @@ docker run -d \
 
 ```bash
 docker run -d \
-  --name journitalia \
+  --name diarum \
   -p 8090:8090 \
   -v /path/to/your/data:/app/data \
-  songtianlun/journitalia:latest
+  songtianlun/diarum:latest
 ```
 
 #### 使用 Docker Compose
@@ -200,15 +200,15 @@ docker run -d \
 version: '3.8'
 
 services:
-  journitalia:
-    image: songtianlun/journitalia:latest
-    container_name: journitalia
+  diarum:
+    image: songtianlun/diarum:latest
+    container_name: diarum
     ports:
       - "8090:8090"
     volumes:
       - ./data:/app/data
     environment:
-      - JOURNITALIA_DATA_PATH=/app/data
+      - DIARUM_DATA_PATH=/app/data
     restart: unless-stopped
 ```
 
@@ -226,20 +226,20 @@ docker compose up -d
 
 1. **命令行参数**：
    ```bash
-   ./journitalia serve --data-dir=/custom/path
+   ./diarum serve --data-dir=/custom/path
    ```
 
 2. **环境变量**：
    ```bash
-   export JOURNITALIA_DATA_PATH=/custom/path
-   ./journitalia serve
+   export DIARUM_DATA_PATH=/custom/path
+   ./diarum serve
    ```
 
 3. **默认值**：`./pb_data`（当前目录）
 
 #### Docker 环境变量
 
-- `JOURNITALIA_DATA_PATH`：设置数据目录路径（默认：`/app/data`）
+- `DIARUM_DATA_PATH`：设置数据目录路径（默认：`/app/data`）
 
 ### 从源码构建
 
@@ -252,8 +252,8 @@ docker compose up -d
 
 ```bash
 # 克隆仓库
-git clone https://github.com/songtianlun/journitalia.git
-cd journitalia
+git clone https://github.com/songtianlun/diarum.git
+cd diarum
 
 # 构建前端
 cd site
@@ -262,17 +262,17 @@ npm run build
 cd ..
 
 # 构建后端
-go build -o journitalia .
+go build -o diarum .
 
 # 运行
-./journitalia serve
+./diarum serve
 ```
 
 或使用 Makefile：
 
 ```bash
 make build
-./journitalia serve
+./diarum serve
 ```
 
 ### 开发
@@ -304,7 +304,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/songtianlun/journitalia/issues).
+If you encounter any issues or have questions, please [open an issue](https://github.com/songtianlun/diarum/issues).
 
 ---
 

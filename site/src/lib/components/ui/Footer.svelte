@@ -38,7 +38,7 @@
 					<span>{tagline}</span>
 					<span class="text-border">·</span>
 				{/if}
-				<span>© {new Date().getFullYear()} Journitalia</span>
+				<span>© {new Date().getFullYear()} Diarum</span>
 				{#if version}
 					<span class="text-border">·</span>
 					<span class="font-mono text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary/80 dark:bg-primary/15 dark:text-primary/90 rounded border border-primary/20">{version}</span>

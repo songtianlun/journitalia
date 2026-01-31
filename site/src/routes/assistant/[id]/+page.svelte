@@ -178,7 +178,7 @@
 </script>
 
 <svelte:head>
-	<title>AI Assistant - Journitalia</title>
+	<title>AI Assistant - Diarum</title>
 </svelte:head>
 
 <div class="h-screen bg-background flex flex-col overflow-hidden">

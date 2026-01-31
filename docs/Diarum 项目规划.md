@@ -1,4 +1,4 @@
-# Journitalia 项目规划文档
+# Diarum 项目规划文档
 
 ---
 
@@ -6,7 +6,7 @@
 
 ### 1.1. 项目愿景与定位
 
-**项目名称**: Journitalia
+**项目名称**: Diarum
 
 **愿景**: 打造一款极简、灵动且功能强大的开源自托管日记应用，深度聚焦个人日记的核心体验，并通过 AI 技术赋能，帮助用户更好地记录、回顾和理解自己的生活。
 
@@ -76,7 +76,7 @@
 
 ### 2.1. 架构设计
 
-Journitalia 将采用**单体应用 (Monolithic) 架构**，将 Go 后端与 PocketBase 数据库后端打包成一个独立的二进制文件。前端是一个独立的单页应用 (SPA)，通过 API 与后端通信。这种架构旨在实现极致的部署简洁性，符合自托管应用的核心理念。
+Diarum 将采用**单体应用 (Monolithic) 架构**，将 Go 后端与 PocketBase 数据库后端打包成一个独立的二进制文件。前端是一个独立的单页应用 (SPA)，通过 API 与后端通信。这种架构旨在实现极致的部署简洁性，符合自托管应用的核心理念。
 
 #### 架构图
 
@@ -100,7 +100,7 @@ graph TD
 
 #### 请求流程
 
-1.  用户通过浏览器访问 Journitalia 的 Web 前端。
+1.  用户通过浏览器访问 Diarum 的 Web 前端。
 2.  前端静态资源（HTML/CSS/JS）由 Go 后端提供服务。
 3.  前端应用通过 RESTful API 向 Go 后端发起数据请求（如获取、保存日记）。
 4.  Go 后端接收到 API 请求，调用嵌入的 PocketBase Go 库来执行相应的数据库操作。
@@ -187,14 +187,14 @@ API 将遵循 RESTful 风格，所有路由以 `/api/` 为前缀。
 ```yaml
 version: '3.8'
 services:
-  journitalia:
-    image: your_dockerhub_username/journitalia:latest
-    container_name: journitalia
+  diarum:
+    image: your_dockerhub_username/diarum:latest
+    container_name: diarum
     restart: unless-stopped
     ports:
       - "8090:8090" # 假设应用监听 8090 端口
     volumes:
-      - ./journitalia_data:/app/pb_data # 将 PocketBase 的数据目录挂载到宿主机
+      - ./diarum_data:/app/pb_data # 将 PocketBase 的数据目录挂载到宿主机
 ```
 
-用户只需执行 `docker-compose up -d` 即可完成部署。所有数据（包括 SQLite 数据库文件和上传的图片）都将持久化在 `journitalia_data` 目录中。
+用户只需执行 `docker-compose up -d` 即可完成部署。所有数据（包括 SQLite 数据库文件和上传的图片）都将持久化在 `diarum_data` 目录中。

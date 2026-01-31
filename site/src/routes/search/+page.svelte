@@ -99,7 +99,7 @@
 </script>
 
 <svelte:head>
-	<title>Search - Journitalia</title>
+	<title>Search - Diarum</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">

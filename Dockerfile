@@ -29,7 +29,7 @@ RUN if [ -z "$VERSION" ]; then \
       VERSION=$(git describe --dirty --always --tags --abbrev=7 2>/dev/null || echo "docker"); \
     fi && \
     echo "Building version: $VERSION" && \
-    go build -ldflags "-X main.Version=$VERSION" -o journitalia .
+    go build -ldflags "-X main.Version=$VERSION" -o diarum .
 
 # Final stage
 FROM alpine:3.23.3
@@ -39,16 +39,16 @@ WORKDIR /app
 RUN apk --no-cache add ca-certificates tzdata
 
 # Copy binary from backend builder (frontend is already embedded in the binary)
-COPY --from=backend-builder /app/journitalia /app/journitalia
+COPY --from=backend-builder /app/diarum /app/diarum
 
 # Create data directory
 RUN mkdir -p /app/data
 
 # Set default data directory environment variable
-ENV JOURNITALIA_DATA_PATH=/app/data
+ENV DIARUM_DATA_PATH=/app/data
 
 # Expose port
 EXPOSE 8090
 
 # Run the application
-CMD ["/app/journitalia", "serve", "--http=0.0.0.0:8090"]
+CMD ["/app/diarum", "serve", "--http=0.0.0.0:8090"]

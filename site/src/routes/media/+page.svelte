@@ -99,7 +99,7 @@
 </script>
 
 <svelte:head>
-	<title>Media Library - Journitalia</title>
+	<title>Media Library - Diarum</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">

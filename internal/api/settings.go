@@ -11,8 +11,8 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
 
-	"github.com/songtianlun/journitalia/internal/config"
-	"github.com/songtianlun/journitalia/internal/logger"
+	"github.com/songtianlun/diarum/internal/config"
+	"github.com/songtianlun/diarum/internal/logger"
 )
 
 // generateToken generates a random 32-character hex token

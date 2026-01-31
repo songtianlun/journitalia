@@ -1,6 +1,7 @@
 # Binaries
-journitalia
+diarum
 diaria
+journitalia
 *.exe
 *.exe~
 *.dll
@@ -16,6 +17,7 @@ go.work
 
 # PocketBase data
 pb_data/
+diarum_data/
 journitalia_data/
 diaria_data/
 !pb_data/.gitkeep

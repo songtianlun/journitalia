@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	chromem "github.com/philippgille/chromem-go"
-	"github.com/songtianlun/journitalia/internal/logger"
+	"github.com/songtianlun/diarum/internal/logger"
 )
 
 const (

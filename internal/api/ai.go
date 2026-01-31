@@ -15,10 +15,10 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
 
-	"github.com/songtianlun/journitalia/internal/chat"
-	"github.com/songtianlun/journitalia/internal/config"
-	"github.com/songtianlun/journitalia/internal/embedding"
-	"github.com/songtianlun/journitalia/internal/logger"
+	"github.com/songtianlun/diarum/internal/chat"
+	"github.com/songtianlun/diarum/internal/config"
+	"github.com/songtianlun/diarum/internal/embedding"
+	"github.com/songtianlun/diarum/internal/logger"
 )
 
 // ModelInfo represents a model from the API

@@ -1,4 +1,4 @@
-module github.com/songtianlun/journitalia
+module github.com/songtianlun/diarum
 
 go 1.23.0
 

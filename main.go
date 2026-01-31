@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/songtianlun/journitalia/internal/api"
-	"github.com/songtianlun/journitalia/internal/config"
-	"github.com/songtianlun/journitalia/internal/embedding"
-	"github.com/songtianlun/journitalia/internal/logger"
-	_ "github.com/songtianlun/journitalia/internal/migrations"
-	"github.com/songtianlun/journitalia/internal/static"
+	"github.com/songtianlun/diarum/internal/api"
+	"github.com/songtianlun/diarum/internal/config"
+	"github.com/songtianlun/diarum/internal/embedding"
+	"github.com/songtianlun/diarum/internal/logger"
+	_ "github.com/songtianlun/diarum/internal/migrations"
+	"github.com/songtianlun/diarum/internal/static"
 
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
@@ -30,7 +30,7 @@ import (
 // Priority: command line flag > environment variable > default value
 func getDataDir() string {
 	// Check new environment variable first
-	if dataDir := os.Getenv("JOURNITALIA_DATA_PATH"); dataDir != "" {
+	if dataDir := os.Getenv("DIARUM_DATA_PATH"); dataDir != "" {
 		return dataDir
 	}
 	// Fallback to legacy environment variable for backwards compatibility
@@ -38,7 +38,7 @@ func getDataDir() string {
 		return dataDir
 	}
 	// Default value
-	return "./journitalia_data"
+	return "./diarum_data"
 }
 
 // serveSPA serves the SPA with fallback to index.html for client-side routing

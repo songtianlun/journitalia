@@ -8,7 +8,7 @@ import (
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 
-	"github.com/songtianlun/journitalia/internal/config"
+	"github.com/songtianlun/diarum/internal/config"
 )
 
 // RegisterPublicRoutes registers public API endpoints that use API token authentication

@@ -117,7 +117,7 @@
 </script>
 
 <svelte:head>
-	<title>{formatDisplayDate(date)} - Journitalia</title>
+	<title>{formatDisplayDate(date)} - Diarum</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">
@@ -128,7 +128,7 @@
 			<div class="max-w-6xl mx-auto px-4 h-11">
 				<div class="flex items-center justify-between h-full">
 					<!-- Left: Brand -->
-					<a href="/" class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Journitalia</a>
+					<a href="/" class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</a>
 
 					<!-- Center: Date and Navigation -->
 					<div class="flex items-center gap-2">

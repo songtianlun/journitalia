@@ -13,9 +13,9 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/models"
-	"github.com/songtianlun/journitalia/internal/config"
-	"github.com/songtianlun/journitalia/internal/embedding"
-	"github.com/songtianlun/journitalia/internal/logger"
+	"github.com/songtianlun/diarum/internal/config"
+	"github.com/songtianlun/diarum/internal/embedding"
+	"github.com/songtianlun/diarum/internal/logger"
 )
 
 // ChatService handles AI chat operations with RAG
@@ -236,7 +236,7 @@ func (s *ChatService) SearchDiariesByDateRange(ctx context.Context, userID strin
 // buildSystemPrompt creates the system prompt with diary context
 func (s *ChatService) buildSystemPrompt(diaries []embedding.DiarySearchResult) string {
 	var sb strings.Builder
-	sb.WriteString("You are a helpful AI assistant for a personal diary application called Journitalia. ")
+	sb.WriteString("You are a helpful AI assistant for a personal diary application called Diarum. ")
 	sb.WriteString("You help users reflect on their diary entries, summarize their experiences, ")
 	sb.WriteString("and provide insights based on their personal journal.\n\n")
 
@@ -265,7 +265,7 @@ func (s *ChatService) buildSystemPrompt(diaries []embedding.DiarySearchResult) s
 // buildAgentSystemPrompt creates the system prompt for the agent with tools
 func (s *ChatService) buildAgentSystemPrompt() string {
 	today := time.Now().Format("2006-01-02")
-	return fmt.Sprintf(`You are a helpful AI assistant for a personal diary application called Journitalia.
+	return fmt.Sprintf(`You are a helpful AI assistant for a personal diary application called Diarum.
 You help users reflect on their diary entries, summarize their experiences, and provide insights based on their personal journal.
 
 Today's date is: %s
