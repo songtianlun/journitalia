@@ -223,5 +223,5 @@
 	</div>
 
 	<!-- Footer -->
-	<Footer maxWidth="md" tagline="A simple, private diary" />
+	<Footer maxWidth="md" />
 </div>
