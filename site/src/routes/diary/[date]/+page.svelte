@@ -271,6 +271,24 @@
 		</div>
 	</div>
 
+	<!-- AI Assistant FAB -->
+	<a
+		href="/assistant"
+		class="fixed bottom-6 right-6 z-30 group"
+		title="AI Assistant"
+	>
+		<div class="relative flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
+			<!-- Sparkles Icon -->
+			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+			</svg>
+		</div>
+		<!-- Tooltip -->
+		<span class="absolute right-14 top-1/2 -translate-y-1/2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+			AI Assistant
+		</span>
+	</a>
+
 	<!-- Footer -->
 	<Footer maxWidth="6xl" tagline="Ctrl+S or ⌘S to save" />
 </div>
