@@ -4,7 +4,7 @@
 	import { isAuthenticated } from '$lib/api/client';
 	import { getApiToken, toggleApiToken, resetApiToken, type ApiTokenStatus } from '$lib/api/settings';
 	import { getAISettings, saveAISettings, fetchModels, buildVectors, buildVectorsIncremental, getVectorStats, type AISettings, type ModelInfo, type BuildVectorsResult, type VectorStats } from '$lib/api/ai';
-	import { exportDiaries, importDiaries, type ExportStats, type ImportStats } from '$lib/api/exportImport';
+	import { exportDiaries, importDiaries, type ExportStats, type ImportStats, type ExportOptions } from '$lib/api/exportImport';
 	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 	import Footer from '$lib/components/ui/Footer.svelte';
 
@@ -46,6 +46,17 @@
 	let importStats: ImportStats | null = null;
 	let importError = '';
 	let importFile: File | null = null;
+
+	// Export options
+	let exportOptions: ExportOptions = {
+		date_range: '3m',
+		include_diaries: true,
+		include_media: true,
+		include_conversations: true
+	};
+	let customStartDate = '';
+	let customEndDate = '';
+	let showExportOptions = true;
 
 	async function loadTokenStatus() {
 		tokenStatus = await getApiToken();
@@ -219,7 +230,13 @@
 		exportError = '';
 		exportStats = null;
 		try {
-			exportStats = await exportDiaries();
+			// Build options with custom dates if needed
+			const options: ExportOptions = { ...exportOptions };
+			if (options.date_range === 'custom') {
+				options.start_date = customStartDate;
+				options.end_date = customEndDate;
+			}
+			exportStats = await exportDiaries(options);
 		} catch (e) {
 			exportError = e instanceof Error ? e.message : 'Export failed';
 		}
@@ -673,13 +690,85 @@ curl "{getBaseUrl()}/api/v1/diaries?token={tokenStatus.token}&date={new Date().t
 				<div class="bg-card rounded-xl shadow-sm border border-border/50 p-6 animate-fade-in">
 					<h2 class="text-lg font-semibold text-foreground mb-4">Data Management</h2>
 					<p class="text-sm text-muted-foreground mb-6">
-						Import and export your diary data. The export file includes all diaries, media files, and AI conversation records.
+						Import and export your diary data. To avoid large export files, you can export data in segments by date range.
 					</p>
 
 					<!-- Export -->
 					<div class="py-4 border-b border-border/50">
-						<div class="font-medium text-foreground mb-1">Export</div>
-						<div class="text-sm text-muted-foreground mb-3">Download all your diary data as a ZIP file</div>
+						<div class="flex items-center justify-between mb-1">
+							<div class="font-medium text-foreground">Export</div>
+							<button
+								on:click={() => showExportOptions = !showExportOptions}
+								class="text-xs text-primary hover:underline"
+							>
+								{showExportOptions ? 'Hide Options' : 'Show Options'}
+							</button>
+						</div>
+						<div class="text-sm text-muted-foreground mb-3">Download your diary data as a ZIP file</div>
+
+						{#if showExportOptions}
+							<div class="mb-4 p-4 bg-muted/50 rounded-lg space-y-4">
+								<div class="text-xs text-amber-600 bg-amber-500/10 p-2 rounded">
+									To avoid large export files, consider exporting data in segments by selecting a specific date range.
+								</div>
+
+								<!-- Date Range -->
+								<div>
+									<label class="block text-sm font-medium text-foreground mb-2">Date Range</label>
+									<select
+										bind:value={exportOptions.date_range}
+										class="w-full px-3 py-2 bg-background rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/50"
+									>
+										<option value="1m">Past 1 month</option>
+										<option value="3m">Past 3 months</option>
+										<option value="6m">Past 6 months</option>
+										<option value="1y">Past 1 year</option>
+										<option value="all">All time</option>
+										<option value="custom">Custom range</option>
+									</select>
+								</div>
+
+								{#if exportOptions.date_range === 'custom'}
+									<div class="grid grid-cols-2 gap-3">
+										<div>
+											<label class="block text-xs text-muted-foreground mb-1">Start Date</label>
+											<input
+												type="date"
+												bind:value={customStartDate}
+												class="w-full px-3 py-2 bg-background rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/50"
+											/>
+										</div>
+										<div>
+											<label class="block text-xs text-muted-foreground mb-1">End Date</label>
+											<input
+												type="date"
+												bind:value={customEndDate}
+												class="w-full px-3 py-2 bg-background rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/50"
+											/>
+										</div>
+									</div>
+								{/if}
+
+								<!-- Content Types -->
+								<div>
+									<label class="block text-sm font-medium text-foreground mb-2">Content to Export</label>
+									<div class="space-y-2">
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input type="checkbox" bind:checked={exportOptions.include_diaries} class="rounded" />
+											<span class="text-sm text-foreground">Diaries</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input type="checkbox" bind:checked={exportOptions.include_media} class="rounded" />
+											<span class="text-sm text-foreground">Media files</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input type="checkbox" bind:checked={exportOptions.include_conversations} class="rounded" />
+											<span class="text-sm text-foreground">AI conversations</span>
+										</label>
+									</div>
+								</div>
+							</div>
+						{/if}
 
 						{#if exportError}
 							<div class="mb-3 p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
@@ -709,15 +798,45 @@ curl "{getBaseUrl()}/api/v1/diaries?token={tokenStatus.token}&date={new Date().t
 						{#if exportStats}
 							<div class="mt-3 p-3 bg-muted rounded-lg text-sm">
 								<div class="font-medium text-foreground mb-2">Export Complete</div>
-								<div class="space-y-1 text-muted-foreground">
-									<div>Diaries: <span class="text-foreground font-medium">{exportStats.diaries}</span></div>
-									<div>Media files: <span class="text-foreground font-medium">{exportStats.media}</span>
-										{#if exportStats.media_failed > 0}
-											<span class="text-destructive">({exportStats.media_failed} failed)</span>
-										{/if}
-									</div>
-									<div>AI conversations: <span class="text-foreground font-medium">{exportStats.conversations}</span> ({exportStats.messages} messages)</div>
+								<div class="text-xs text-muted-foreground mb-2">
+									Period: {exportStats.start_date} to {exportStats.end_date}
 								</div>
+								<div class="space-y-2 text-muted-foreground">
+									<div class="flex justify-between">
+										<span>Diaries:</span>
+										<span>
+											<span class="text-foreground font-medium">{exportStats.diaries.actual_exported}</span>
+											<span class="text-xs">/ {exportStats.diaries.should_export} selected / {exportStats.diaries.total_in_system} total</span>
+										</span>
+									</div>
+									<div class="flex justify-between">
+										<span>Media:</span>
+										<span>
+											<span class="text-foreground font-medium">{exportStats.media.actual_exported}</span>
+											<span class="text-xs">/ {exportStats.media.should_export} selected / {exportStats.media.total_in_system} total</span>
+										</span>
+									</div>
+									<div class="flex justify-between">
+										<span>Conversations:</span>
+										<span>
+											<span class="text-foreground font-medium">{exportStats.conversations.actual_exported}</span>
+											<span class="text-xs">/ {exportStats.conversations.should_export} selected / {exportStats.conversations.total_in_system} total</span>
+											<span class="text-xs">({exportStats.messages} messages)</span>
+										</span>
+									</div>
+								</div>
+								{#if exportStats.failed_items && exportStats.failed_items.length > 0}
+									<div class="mt-3 pt-2 border-t border-border/50">
+										<div class="font-medium text-destructive mb-1">Failed Items:</div>
+										<div class="text-xs space-y-1 max-h-24 overflow-y-auto">
+											{#each exportStats.failed_items as item}
+												<div class="text-muted-foreground">
+													<span class="text-destructive">[{item.type}]</span> {item.id}: {item.reason}
+												</div>
+											{/each}
+										</div>
+									</div>
+								{/if}
 							</div>
 						{/if}
 					</div>

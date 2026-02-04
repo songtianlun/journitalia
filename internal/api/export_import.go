@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -23,6 +24,22 @@ import (
 
 const maxImportSize = 100 << 20     // 100MB total upload
 const maxSingleFileSize = 100 << 20 // 100MB per file (ZIP bomb protection)
+
+// ---------- Export Request ----------
+
+// ExportRequest defines the export options
+type ExportRequest struct {
+	// DateRange: "1m", "3m", "6m", "1y", "all", "custom"
+	DateRange string `json:"date_range"`
+	// StartDate: required when DateRange is "custom" (format: YYYY-MM-DD)
+	StartDate string `json:"start_date,omitempty"`
+	// EndDate: required when DateRange is "custom" (format: YYYY-MM-DD)
+	EndDate string `json:"end_date,omitempty"`
+	// Content types to export
+	IncludeDiaries       bool `json:"include_diaries"`
+	IncludeMedia         bool `json:"include_media"`
+	IncludeConversations bool `json:"include_conversations"`
+}
 
 // ---------- Export/Import 数据结构 ----------
 
@@ -64,11 +81,29 @@ type exportMessage struct {
 }
 
 type exportStats struct {
-	Diaries       int `json:"diaries"`
-	Media         int `json:"media"`
-	MediaFailed   int `json:"media_failed"`
-	Conversations int `json:"conversations"`
-	Messages      int `json:"messages"`
+	// Date range info
+	DateRangeType string `json:"date_range_type"`
+	StartDate     string `json:"start_date"`
+	EndDate       string `json:"end_date"`
+	// Counts: total in system, should export, actually exported
+	Diaries       exportCountDetail `json:"diaries"`
+	Media         exportCountDetail `json:"media"`
+	Conversations exportCountDetail `json:"conversations"`
+	Messages      int               `json:"messages"`
+	// Failed items with reasons
+	FailedItems []exportFailedItem `json:"failed_items,omitempty"`
+}
+
+type exportCountDetail struct {
+	TotalInSystem  int `json:"total_in_system"`
+	ShouldExport   int `json:"should_export"`
+	ActualExported int `json:"actual_exported"`
+}
+
+type exportFailedItem struct {
+	Type   string `json:"type"` // "diary", "media", "conversation"
+	ID     string `json:"id"`
+	Reason string `json:"reason"`
 }
 
 type importStats struct {
@@ -105,50 +140,94 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 	}
 	userID := authRecord.Id
 
-	// 查询所有日记
-	diaries, err := app.Dao().FindRecordsByFilter(
-		"diaries",
-		"owner = {:owner}",
-		"-date",
-		-1, 0,
-		map[string]any{"owner": userID},
-	)
-	if err != nil {
-		logger.Error("[Export] failed to fetch diaries: %v", err)
-		return apis.NewBadRequestError("Failed to fetch diaries", err)
+	// Parse export request
+	var req ExportRequest
+	if err := c.Bind(&req); err != nil {
+		// Default values if no body provided
+		req = ExportRequest{
+			DateRange:            "3m",
+			IncludeDiaries:       true,
+			IncludeMedia:         true,
+			IncludeConversations: true,
+		}
 	}
 
-	// 查询所有媒体
-	mediaRecords, err := app.Dao().FindRecordsByFilter(
-		"media",
-		"owner = {:owner}",
-		"-created",
-		-1, 0,
-		map[string]any{"owner": userID},
-	)
-	if err != nil {
-		logger.Error("[Export] failed to fetch media: %v", err)
-		// 媒体查询失败不致命，继续导出
-		mediaRecords = nil
+	// Apply defaults for empty values
+	if req.DateRange == "" {
+		req.DateRange = "3m"
 	}
 
-	// 查询所有 AI 对话
-	conversations, err := app.Dao().FindRecordsByFilter(
-		"ai_conversations",
-		"owner = {:owner}",
-		"-updated",
-		-1, 0,
-		map[string]any{"owner": userID},
-	)
+	// Calculate date range
+	startDate, endDate, err := calculateDateRange(req)
 	if err != nil {
-		logger.Error("[Export] failed to fetch conversations: %v", err)
-		conversations = nil
+		return apis.NewBadRequestError(err.Error(), nil)
 	}
 
-	// 构建导出数据
-	stats := exportStats{}
+	stats := exportStats{
+		DateRangeType: req.DateRange,
+		StartDate:     startDate.Format("2006-01-02"),
+		EndDate:       endDate.Format("2006-01-02"),
+		FailedItems:   make([]exportFailedItem, 0),
+	}
 
-	// 构建 diary 列表
+	// Get total counts in system first
+	allDiaries, _ := app.Dao().FindRecordsByFilter(
+		"diaries", "owner = {:owner}", "-date", -1, 0,
+		map[string]any{"owner": userID},
+	)
+	stats.Diaries.TotalInSystem = len(allDiaries)
+
+	allMedia, _ := app.Dao().FindRecordsByFilter(
+		"media", "owner = {:owner}", "-created", -1, 0,
+		map[string]any{"owner": userID},
+	)
+	stats.Media.TotalInSystem = len(allMedia)
+
+	allConversations, _ := app.Dao().FindRecordsByFilter(
+		"ai_conversations", "owner = {:owner}", "-updated", -1, 0,
+		map[string]any{"owner": userID},
+	)
+	stats.Conversations.TotalInSystem = len(allConversations)
+
+	// Build exported data with filtering
+	var diaries []*models.Record
+	var mediaRecords []*models.Record
+	var conversations []*models.Record
+
+	// Filter and export diaries
+	if req.IncludeDiaries {
+		for _, d := range allDiaries {
+			diaryDate := extractExportDate(d.GetString("date"))
+			if isDateInRange(diaryDate, startDate, endDate) {
+				diaries = append(diaries, d)
+			}
+		}
+	}
+	stats.Diaries.ShouldExport = len(diaries)
+
+	// Filter and export media (based on creation date)
+	if req.IncludeMedia {
+		for _, m := range allMedia {
+			createdStr := m.GetString("created")
+			if isDateInRange(extractExportDate(createdStr), startDate, endDate) {
+				mediaRecords = append(mediaRecords, m)
+			}
+		}
+	}
+	stats.Media.ShouldExport = len(mediaRecords)
+
+	// Filter and export conversations (based on update date)
+	if req.IncludeConversations {
+		for _, c := range allConversations {
+			updatedStr := c.GetString("updated")
+			if isDateInRange(extractExportDate(updatedStr), startDate, endDate) {
+				conversations = append(conversations, c)
+			}
+		}
+	}
+	stats.Conversations.ShouldExport = len(conversations)
+
+	// Build diary list
 	exportDiaries := make([]exportDiary, 0, len(diaries))
 	for _, d := range diaries {
 		exportDiaries = append(exportDiaries, exportDiary{
@@ -159,9 +238,9 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 			Weather: d.GetString("weather"),
 		})
 	}
-	stats.Diaries = len(exportDiaries)
+	stats.Diaries.ActualExported = len(exportDiaries)
 
-	// 构建 media 列表
+	// Build media list
 	exportMediaList := make([]exportMedia, 0, len(mediaRecords))
 	for _, m := range mediaRecords {
 		diaryIDs := m.GetStringSlice("diary")
@@ -173,7 +252,7 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 			Diary: diaryIDs,
 		})
 	}
-	stats.Media = len(exportMediaList)
+	stats.Media.ActualExported = len(exportMediaList)
 
 	// 构建 conversations 列表
 	exportConvs := make([]exportConversation, 0, len(conversations))
@@ -218,7 +297,7 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 			Messages: msgs,
 		})
 	}
-	stats.Conversations = len(exportConvs)
+	stats.Conversations.ActualExported = len(exportConvs)
 
 	// 序列化 JSON
 	data := exportData{
@@ -263,6 +342,7 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 	}
 
 	// 写入 media/ 目录
+	mediaExportedCount := 0
 	for _, m := range exportMediaList {
 		if m.File == "" {
 			continue
@@ -271,7 +351,11 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 		record, err := app.Dao().FindRecordById("media", m.ID)
 		if err != nil {
 			logger.Warn("[Export] media record %s not found: %v", m.ID, err)
-			stats.MediaFailed++
+			stats.FailedItems = append(stats.FailedItems, exportFailedItem{
+				Type:   "media",
+				ID:     m.ID,
+				Reason: fmt.Sprintf("record not found: %v", err),
+			})
 			continue
 		}
 
@@ -279,7 +363,11 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 		reader, err := fsys.GetFile(fileKey)
 		if err != nil {
 			logger.Warn("[Export] failed to read media file %s: %v", fileKey, err)
-			stats.MediaFailed++
+			stats.FailedItems = append(stats.FailedItems, exportFailedItem{
+				Type:   "media",
+				ID:     m.ID,
+				Reason: fmt.Sprintf("failed to read file: %v", err),
+			})
 			continue
 		}
 
@@ -287,14 +375,20 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 		reader.Close()
 		if err != nil {
 			logger.Warn("[Export] failed to read media content %s: %v", fileKey, err)
-			stats.MediaFailed++
+			stats.FailedItems = append(stats.FailedItems, exportFailedItem{
+				Type:   "media",
+				ID:     m.ID,
+				Reason: fmt.Sprintf("failed to read content: %v", err),
+			})
 			continue
 		}
 
 		if w, err := zipWriter.Create("media/" + m.File); err == nil {
 			w.Write(content)
+			mediaExportedCount++
 		}
 	}
+	stats.Media.ActualExported = mediaExportedCount
 
 	if err := zipWriter.Close(); err != nil {
 		return apis.NewBadRequestError("Failed to create ZIP", err)
@@ -312,7 +406,7 @@ func handleExport(c echo.Context, app *pocketbase.PocketBase) error {
 	c.Response().Write(buf.Bytes())
 
 	logger.Info("[Export] completed for user %s: %d diaries, %d media, %d conversations",
-		userID, stats.Diaries, stats.Media, stats.Conversations)
+		userID, stats.Diaries.ActualExported, stats.Media.ActualExported, stats.Conversations.ActualExported)
 
 	return nil
 }
@@ -332,7 +426,7 @@ func handleImport(c echo.Context, app *pocketbase.PocketBase, embeddingService *
 		return apis.NewBadRequestError("Missing upload file", err)
 	}
 	if fh.Size > maxImportSize {
-		return apis.NewBadRequestError("File too large (max 100MB)", nil)
+		return apis.NewBadRequestError("File too large (max 100MB). Please use segmented export with date range filters to create smaller export files, then import them separately.", nil)
 	}
 
 	f, err := fh.Open()
@@ -346,7 +440,7 @@ func handleImport(c echo.Context, app *pocketbase.PocketBase, embeddingService *
 		return apis.NewBadRequestError("Failed to read upload", err)
 	}
 	if int64(len(zipBytes)) > maxImportSize {
-		return apis.NewBadRequestError("File too large (max 100MB)", nil)
+		return apis.NewBadRequestError("File too large (max 100MB). Please use segmented export with date range filters to create smaller export files, then import them separately.", nil)
 	}
 
 	// 解压 ZIP
@@ -695,4 +789,57 @@ func generateMarkdown(d exportDiary) string {
 	}
 	sb.WriteString(d.Content)
 	return sb.String()
+}
+
+// calculateDateRange calculates the start and end dates based on the export request
+func calculateDateRange(req ExportRequest) (time.Time, time.Time, error) {
+	now := time.Now().UTC()
+	endDate := now
+
+	switch req.DateRange {
+	case "1m":
+		return now.AddDate(0, -1, 0), endDate, nil
+	case "3m":
+		return now.AddDate(0, -3, 0), endDate, nil
+	case "6m":
+		return now.AddDate(0, -6, 0), endDate, nil
+	case "1y":
+		return now.AddDate(-1, 0, 0), endDate, nil
+	case "all":
+		// Use a very old date for "all"
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC), endDate, nil
+	case "custom":
+		if req.StartDate == "" || req.EndDate == "" {
+			return time.Time{}, time.Time{}, fmt.Errorf("start_date and end_date are required for custom date range")
+		}
+		start, err := time.Parse("2006-01-02", req.StartDate)
+		if err != nil {
+			return time.Time{}, time.Time{}, fmt.Errorf("invalid start_date format, expected YYYY-MM-DD")
+		}
+		end, err := time.Parse("2006-01-02", req.EndDate)
+		if err != nil {
+			return time.Time{}, time.Time{}, fmt.Errorf("invalid end_date format, expected YYYY-MM-DD")
+		}
+		if start.After(end) {
+			return time.Time{}, time.Time{}, fmt.Errorf("start_date cannot be after end_date")
+		}
+		// Set end date to end of day
+		end = end.Add(24*time.Hour - time.Second)
+		return start, end, nil
+	default:
+		// Default to 3 months
+		return now.AddDate(0, -3, 0), endDate, nil
+	}
+}
+
+// isDateInRange checks if a date string (YYYY-MM-DD) is within the given range
+func isDateInRange(dateStr string, start, end time.Time) bool {
+	if dateStr == "" {
+		return false
+	}
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return false
+	}
+	return !date.Before(start) && !date.After(end)
 }
