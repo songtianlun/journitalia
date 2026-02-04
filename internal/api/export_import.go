@@ -600,6 +600,14 @@ func handleImport(c echo.Context, app *pocketbase.PocketBase, embeddingService *
 				continue
 			}
 
+			// Validate MIME type
+			detectedMime, allowed := config.IsAllowedMediaType(fileBytes)
+			if !allowed {
+				logger.Warn("[Import] media file %s has disallowed MIME type: %s", m.File, detectedMime)
+				stats.Media.Failed++
+				continue
+			}
+
 			// Check if media with same ID already exists - skip if so
 			if m.ID != "" {
 				existing, _ := app.Dao().FindRecordById("media", m.ID)
