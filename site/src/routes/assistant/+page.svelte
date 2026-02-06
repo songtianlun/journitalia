@@ -221,7 +221,7 @@
 							<span class="hidden sm:inline">Press Enter to send, Shift+Enter for new line ·</span>
 							<span>Diarum</span>
 							{#if version}
-								<span class="font-mono text-[10px]">{version}</span>
+								<a href="https://github.com/songtianlun/diarum" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] hover:text-foreground transition-colors">{version}</a>
 							{/if}
 							<span class="hidden sm:inline">·</span>
 							<span class="hidden sm:block"><ThemeToggle /></span>

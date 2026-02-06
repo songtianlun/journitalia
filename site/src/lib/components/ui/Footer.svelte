@@ -39,7 +39,7 @@
 				{/if}
 				<span class="whitespace-nowrap">© {new Date().getFullYear()} Diarum</span>
 				{#if version}
-					<span class="font-mono text-[10px] text-muted-foreground/70 whitespace-nowrap">{version}</span>
+					<a href="https://github.com/songtianlun/diarum" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] text-muted-foreground/70 whitespace-nowrap hover:text-foreground transition-colors">{version}</a>
 				{/if}
 			</div>
 			<ThemeToggle />
