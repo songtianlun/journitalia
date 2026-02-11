@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	export let className = '';
+	export let onNavigate: (() => void) | undefined = undefined;
 
 	interface TocItem {
 		id: string;
@@ -26,6 +27,7 @@
 				history.replaceState(null, '', `#${id}`);
 			}
 		}
+		onNavigate?.();
 	}
 
 	function updateActiveSection() {

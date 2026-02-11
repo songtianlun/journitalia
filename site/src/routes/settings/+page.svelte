@@ -323,7 +323,7 @@
 					<!-- Left: Brand -->
 					<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
 						<img src="/logo.png" alt="Diarum" class="w-6 h-6" />
-						<span class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
+						<span class="hidden sm:inline text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
 					</a>
 
 					<!-- Center: Title -->
@@ -343,22 +343,13 @@
 							title="Table of contents"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
 							</svg>
 						</button>
 					</div>
 				</div>
 			</div>
 		</header>
-
-		<!-- Mobile TOC - Inside sticky container -->
-		{#if showMobileToc}
-			<div class="lg:hidden glass-subtle border-b border-border/50 animate-slide-in-down">
-				<div class="max-w-6xl mx-auto px-4 py-3">
-					<SettingsToc />
-				</div>
-			</div>
-		{/if}
 	</div>
 
 	<!-- Main Content -->
@@ -1049,3 +1040,119 @@ curl "{getBaseUrl()}/api/v1/diaries?token={tokenStatus.token}&date={new Date().t
 
 	<Footer maxWidth="6xl" tagline="Manage your settings" />
 </div>
+
+<!-- Mobile Drawer -->
+{#if showMobileToc}
+	<!-- Backdrop -->
+	<button
+		class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+		on:click={() => showMobileToc = false}
+		aria-label="Close menu"
+	></button>
+
+	<!-- Drawer Panel -->
+	<div class="fixed inset-y-0 left-0 w-72 bg-card border-r border-border shadow-2xl z-50 lg:hidden animate-slide-in-left">
+		<!-- Drawer Header -->
+		<div class="flex items-center justify-between px-5 py-4 border-b border-border/50">
+			<div class="flex items-center gap-2">
+				<img src="/logo.png" alt="Diarum" class="w-6 h-6" />
+				<span class="font-semibold text-foreground">Settings</span>
+			</div>
+			<button
+				on:click={() => showMobileToc = false}
+				class="p-2 hover:bg-muted rounded-lg transition-colors"
+				aria-label="Close"
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+
+		<!-- Drawer Content -->
+		<div class="flex flex-col h-[calc(100%-57px)]">
+			<!-- Actions Section -->
+			<div class="px-3 py-3">
+				<div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+					Quick Actions
+				</div>
+				<div class="space-y-0.5">
+					<a
+						href="/diary"
+						class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-muted/70 transition-all duration-200 group"
+						on:click={() => showMobileToc = false}
+					>
+						<div class="p-1.5 rounded-md bg-green-500/10 text-green-500 group-hover:bg-green-500/20 transition-colors">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+						</div>
+						<div class="min-w-0">
+							<div class="text-xs font-medium text-foreground">Calendar</div>
+							<div class="text-[10px] text-muted-foreground truncate">View all diary entries</div>
+						</div>
+					</a>
+
+					<a
+						href="/assistant"
+						class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-muted/70 transition-all duration-200 group"
+						on:click={() => showMobileToc = false}
+					>
+						<div class="p-1.5 rounded-md bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<rect x="4" y="6" width="16" height="12" rx="2" stroke-width="2"/>
+								<circle cx="9" cy="11" r="1.5" fill="currentColor"/>
+								<circle cx="15" cy="11" r="1.5" fill="currentColor"/>
+							</svg>
+						</div>
+						<div class="min-w-0">
+							<div class="text-xs font-medium text-foreground">AI Assistant</div>
+							<div class="text-[10px] text-muted-foreground truncate">Chat with AI about your diary</div>
+						</div>
+					</a>
+
+					<a
+						href="/search"
+						class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-muted/70 transition-all duration-200 group"
+						on:click={() => showMobileToc = false}
+					>
+						<div class="p-1.5 rounded-md bg-blue-500/10 text-blue-500 group-hover:bg-blue-500/20 transition-colors">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+							</svg>
+						</div>
+						<div class="min-w-0">
+							<div class="text-xs font-medium text-foreground">Search</div>
+							<div class="text-[10px] text-muted-foreground truncate">Find diary entries</div>
+						</div>
+					</a>
+
+					<a
+						href="/media"
+						class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-muted/70 transition-all duration-200 group"
+						on:click={() => showMobileToc = false}
+					>
+						<div class="p-1.5 rounded-md bg-purple-500/10 text-purple-500 group-hover:bg-purple-500/20 transition-colors">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+						</div>
+						<div class="min-w-0">
+							<div class="text-xs font-medium text-foreground">Media</div>
+							<div class="text-[10px] text-muted-foreground truncate">Browse photos & files</div>
+						</div>
+					</a>
+				</div>
+			</div>
+
+			<!-- Divider -->
+			<div class="mx-3 border-t border-border/50"></div>
+
+			<!-- TOC Section -->
+			<div class="flex-1 overflow-y-auto px-3 py-3">
+				<SettingsToc onNavigate={() => showMobileToc = false} />
+			</div>
+		</div>
+	</div>
+{/if}
