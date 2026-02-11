@@ -130,7 +130,7 @@
 					<!-- Left: Brand -->
 					<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
 						<img src="/logo.png" alt="Diarum" class="w-6 h-6" />
-						<span class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
+						<span class="hidden sm:inline text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
 					</a>
 
 					<!-- Center: Date and Navigation -->
