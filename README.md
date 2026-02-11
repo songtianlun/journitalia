@@ -29,6 +29,8 @@
 - 📝 **Markdown Support** - Write your daily thoughts with full Markdown formatting
 - 🖼️ **Media Upload** - Attach images and files to your diary entries
 - 📱 **Progressive Web App** - Install on any device with offline support and app-like experience
+- 📤 **One-Click Share** - Share your diary entries instantly with a single tap
+- 🔄 **Offline & Auto Sync** - Work offline seamlessly with automatic cache synchronization and real-time sync status monitoring
 - 🔒 **Self-Hosted** - Complete control over your personal data
 - 🚀 **Easy Deployment** - Single binary with embedded frontend, deploy anywhere
 - 💾 **PocketBase Backend** - Reliable database with built-in admin panel
@@ -203,6 +205,8 @@ Access the PocketBase admin panel at `http://localhost:8090/_/` to:
 - 📝 **Markdown 支持** - 使用完整的 Markdown 格式记录每日想法
 - 🖼️ **媒体上传** - 为日记条目添加图片和文件
 - 📱 **渐进式 Web 应用** - 支持安装到任意设备，离线可用，原生应用般的体验
+- 📤 **一键分享** - 轻点即可分享日记内容
+- 🔄 **离线与自动同步** - 完整离线支持，自动缓存同步，实时查看数据同步状态
 - 🔒 **自托管** - 完全掌控你的个人数据
 - 🚀 **易于部署** - 单一二进制文件，内嵌前端，随处部署
 - 💾 **PocketBase 后端** - 可靠的数据库和内置管理面板
