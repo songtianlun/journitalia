@@ -5,6 +5,7 @@
 	import TiptapEditor from '$lib/components/editor/TiptapEditor.svelte';
 	import TableOfContents from '$lib/components/ui/TableOfContents.svelte';
 	import Footer from '$lib/components/ui/Footer.svelte';
+	import DiaryShareModal from '$lib/components/share/DiaryShareModal.svelte';
 	import { getDiaryByDate } from '$lib/api/diaries';
 	import { isAuthenticated } from '$lib/api/client';
 	import {
@@ -36,6 +37,7 @@
 	let loadRequestId = 0;
 	let showMobileToc = false;
 	let showDesktopToc = true;
+	let showShareModal = false;
 
 	$: date = $page.params.date;
 	$: canGoNext = !isToday(date);
@@ -244,7 +246,7 @@
 							</button>
 						{/if}
 
-						<a href="/assistant" class="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200" title="AI Assistant">
+						<a href="/assistant" class="hidden sm:block p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200" title="AI Assistant">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<rect x="4" y="6" width="16" height="12" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 								<line x1="12" y1="6" x2="12" y2="2" stroke-width="2" stroke-linecap="round"/>
@@ -256,6 +258,16 @@
 								<rect x="21" y="10" width="2" height="4" rx="1" fill="currentColor"/>
 							</svg>
 						</a>
+
+						<button
+							on:click={() => showShareModal = true}
+							class="hidden sm:block p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200"
+							title="Share as image"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+							</svg>
+						</button>
 
 						<button
 							on:click={() => {
@@ -304,8 +316,37 @@
 		<!-- Mobile TOC - Inside sticky container -->
 		{#if showMobileToc}
 			<div class="lg:hidden glass-subtle border-b border-border/50 animate-slide-in-down">
-				<div class="max-w-6xl mx-auto px-4 py-2 max-h-[30vh] overflow-y-auto">
-					<TableOfContents {content} />
+				<div class="max-w-6xl mx-auto px-4 py-3">
+					<!-- Quick Actions -->
+					<div class="flex items-center gap-2 pb-3 mb-3 border-b border-border/30">
+						<a
+							href="/assistant"
+							class="flex items-center gap-2 px-3 py-2 text-sm bg-muted/50 hover:bg-muted rounded-lg transition-colors"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<rect x="4" y="6" width="16" height="12" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<line x1="12" y1="6" x2="12" y2="2" stroke-width="2" stroke-linecap="round"/>
+								<circle cx="12" cy="2" r="1" fill="currentColor"/>
+								<circle cx="9" cy="11" r="1.5" fill="currentColor"/>
+								<circle cx="15" cy="11" r="1.5" fill="currentColor"/>
+								<path d="M9 15h6" stroke-width="2" stroke-linecap="round"/>
+							</svg>
+							<span>AI Assistant</span>
+						</a>
+						<button
+							on:click={() => { showMobileToc = false; showShareModal = true; }}
+							class="flex items-center gap-2 px-3 py-2 text-sm bg-muted/50 hover:bg-muted rounded-lg transition-colors"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+							</svg>
+							<span>Share</span>
+						</button>
+					</div>
+					<!-- Table of Contents -->
+					<div class="max-h-[25vh] overflow-y-auto">
+						<TableOfContents {content} />
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -352,6 +393,14 @@
 	<!-- Footer -->
 	<Footer maxWidth="6xl" tagline="Ctrl+S or ⌘S to save" />
 </div>
+
+<!-- Share Modal -->
+<DiaryShareModal
+	isOpen={showShareModal}
+	{date}
+	{content}
+	onClose={() => showShareModal = false}
+/>
 
 <style>
 	kbd {
