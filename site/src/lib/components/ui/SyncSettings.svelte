@@ -10,13 +10,20 @@
 	} from '$lib/stores/diaryCache';
 	import { onlineState, checkOnlineStatus } from '$lib/stores/onlineStatus';
 	import { syncConfig, setAutoSaveInterval, setCacheDays } from '$lib/stores/syncConfig';
+	import { getSyncSettings, saveSyncSettings } from '$lib/api/settings';
 
 	let syncing = false;
 	let clearing = false;
+	let saving = false;
 	let autoSaveSeconds = 3;
 	let cacheDaysValue = 30;
+	let hasChanges = false;
 	let refreshInterval: ReturnType<typeof setInterval> | null = null;
 	let tick = 0; // Used to force re-render for relative time updates
+
+	// Track original values to detect changes
+	let originalAutoSaveSeconds = 3;
+	let originalCacheDaysValue = 30;
 
 	// Format relative time
 	function formatRelativeTime(timestamp: number): string {
@@ -65,28 +72,53 @@
 
 	function handleAutoSaveChange() {
 		setAutoSaveInterval(autoSaveSeconds * 1000);
+		hasChanges = autoSaveSeconds !== originalAutoSaveSeconds || cacheDaysValue !== originalCacheDaysValue;
 	}
 
 	function handleCacheDaysChange() {
 		setCacheDays(cacheDaysValue);
 		runCacheCleanup();
+		hasChanges = autoSaveSeconds !== originalAutoSaveSeconds || cacheDaysValue !== originalCacheDaysValue;
+	}
+
+	async function handleSaveSettings() {
+		saving = true;
+		const success = await saveSyncSettings({
+			autoSaveInterval: autoSaveSeconds * 1000,
+			cacheDays: cacheDaysValue
+		});
+		if (success) {
+			originalAutoSaveSeconds = autoSaveSeconds;
+			originalCacheDaysValue = cacheDaysValue;
+			hasChanges = false;
+		}
+		saving = false;
 	}
 
 	// Refresh config from store and update tick for relative time
 	function refreshConfig() {
-		autoSaveSeconds = $syncConfig.autoSaveInterval / 1000;
-		cacheDaysValue = $syncConfig.cacheDays;
 		tick++; // Force re-render to update relative times
 	}
 
-	onMount(() => {
+	async function loadSettingsFromBackend() {
+		const settings = await getSyncSettings();
+		autoSaveSeconds = settings.autoSaveInterval / 1000;
+		cacheDaysValue = settings.cacheDays;
+		originalAutoSaveSeconds = autoSaveSeconds;
+		originalCacheDaysValue = cacheDaysValue;
+		// Also update local store
+		setAutoSaveInterval(settings.autoSaveInterval);
+		setCacheDays(settings.cacheDays);
+	}
+
+	onMount(async () => {
 		// initDiaryCache is idempotent, safe to call multiple times
 		initDiaryCache();
 
-		// Initialize from config
-		refreshConfig();
+		// Load settings from backend
+		await loadSettingsFromBackend();
 
-		// Periodically refresh config and relative times (every 1 second for smoother updates)
+		// Periodically refresh relative times (every 1 second for smoother updates)
 		refreshInterval = setInterval(refreshConfig, 1000);
 	});
 
@@ -243,6 +275,23 @@
 
 	<!-- Actions -->
 	<div class="flex gap-3 pt-2">
+		<button
+			on:click={handleSaveSettings}
+			disabled={saving || !hasChanges}
+			class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50 flex items-center gap-2"
+		>
+			{#if saving}
+				<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+				</svg>
+			{:else}
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+				</svg>
+			{/if}
+			Save Settings
+		</button>
 		<button
 			on:click={handleSyncNow}
 			disabled={syncing || $cacheStats.pendingSync === 0}

@@ -13,6 +13,10 @@ var ConfigRegistry = map[string]ConfigMeta{
 	"api.token":   {Type: "string", Default: "", Encrypted: false},
 	"api.enabled": {Type: "bool", Default: false, Encrypted: false},
 
+	// Sync settings
+	"sync.autoSaveInterval": {Type: "int", Default: 3000, Encrypted: false},  // milliseconds
+	"sync.cacheDays":        {Type: "int", Default: 30, Encrypted: false},
+
 	// AI settings (unified API key and base URL)
 	"ai.enabled":          {Type: "bool", Default: false, Encrypted: false},
 	"ai.api_key":          {Type: "string", Default: "", Encrypted: true},
