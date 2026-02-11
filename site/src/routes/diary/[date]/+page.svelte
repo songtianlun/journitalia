@@ -28,6 +28,8 @@
 		cleanupDiaryCache
 	} from '$lib/stores/diaryCache';
 	import { onlineState } from '$lib/stores/onlineStatus';
+	import { isInCacheRange } from '$lib/stores/persistence';
+	import { getConfig } from '$lib/stores/syncConfig';
 
 	let content = '';
 	let loading = true;
@@ -64,23 +66,67 @@
 	async function loadDiary(targetDate: string) {
 		const currentRequestId = ++loadRequestId;
 		const cached = getCachedContent(targetDate);
+		const config = getConfig();
+		const inCacheRange = isInCacheRange(targetDate, config.cacheDays);
+
+		// If we have cache, use it immediately
 		if (cached) {
 			content = cached.content;
+			// If dirty, don't fetch from server at all
 			if (cached.isDirty) {
 				loading = false;
+				return;
+			}
+			// If in cache range and have valid cache, show content immediately
+			// and optionally refresh in background
+			if (inCacheRange) {
+				loading = false;
+				// Background refresh only if online
+				if ($onlineState.isOnline) {
+					refreshInBackground(targetDate, currentRequestId);
+				}
 				return;
 			}
 		} else {
 			content = '';
 		}
+
+		// No cache or outside cache range - need to fetch
 		loading = true;
-		const diary = await getDiaryByDate(targetDate);
-		if (currentRequestId !== loadRequestId) return;
-		updateFromServer(targetDate, diary);
-		if (currentRequestId !== loadRequestId) return;
-		const updatedCache = getCachedContent(targetDate);
-		content = updatedCache?.content || '';
+		try {
+			const diary = await getDiaryByDate(targetDate);
+			if (currentRequestId !== loadRequestId) return;
+			updateFromServer(targetDate, diary);
+			if (currentRequestId !== loadRequestId) return;
+			const updatedCache = getCachedContent(targetDate);
+			content = updatedCache?.content || '';
+		} catch (error) {
+			console.error('Failed to load diary:', error);
+			// If fetch fails but we have cache, use it
+			if (cached) {
+				content = cached.content;
+			}
+		}
 		loading = false;
+	}
+
+	// Background refresh without blocking UI
+	async function refreshInBackground(targetDate: string, requestId: number) {
+		try {
+			const diary = await getDiaryByDate(targetDate);
+			if (requestId !== loadRequestId) return;
+			updateFromServer(targetDate, diary);
+			// Update content if server has newer data and we're still on same date
+			if (requestId === loadRequestId) {
+				const updatedCache = getCachedContent(targetDate);
+				if (updatedCache && !updatedCache.isDirty) {
+					content = updatedCache.content;
+				}
+			}
+		} catch (error) {
+			// Silent fail for background refresh - we already have cache
+			console.debug('Background refresh failed:', error);
+		}
 	}
 
 	function handleContentChange(newContent: string) {

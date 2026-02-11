@@ -68,11 +68,35 @@ export function persistEntry(entry: PersistedEntry): void {
 }
 
 /**
+ * Save multiple entries to persistence (batch operation)
+ */
+export function persistEntries(entries: PersistedEntry[]): void {
+	if (entries.length === 0) return;
+	const data = loadPersistedData();
+	for (const entry of entries) {
+		data.entries[entry.date] = entry;
+	}
+	savePersistedData(data);
+}
+
+/**
  * Remove an entry from persistence
  */
 export function removePersistedEntry(date: string): void {
 	const data = loadPersistedData();
 	delete data.entries[date];
+	savePersistedData(data);
+}
+
+/**
+ * Remove multiple entries from persistence (batch operation)
+ */
+export function removePersistedEntries(dates: string[]): void {
+	if (dates.length === 0) return;
+	const data = loadPersistedData();
+	for (const date of dates) {
+		delete data.entries[date];
+	}
 	savePersistedData(data);
 }
 

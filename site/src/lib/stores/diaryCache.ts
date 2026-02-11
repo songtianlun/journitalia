@@ -4,10 +4,13 @@ import type { Diary } from '$lib/api/client';
 import {
 	loadPersistedData,
 	persistEntry,
+	persistEntries,
 	removePersistedEntry,
+	removePersistedEntries,
 	getAllPersistedEntries,
 	cleanupOldEntries,
 	isInCacheRange,
+	clearAllPersistedData,
 	type PersistedEntry
 } from './persistence';
 import { checkOnlineStatus, initOnlineStatus } from './onlineStatus';
@@ -61,6 +64,7 @@ let persistTimer: ReturnType<typeof setTimeout> | null = null;
 let initialized = false;
 let cleanupOnlineStatus: (() => void) | null = null;
 let unsubscribeSyncConfig: (() => void) | null = null;
+let storageEventHandler: ((e: StorageEvent) => void) | null = null;
 
 // Retry state for offline sync
 let retryCount = 0;
@@ -70,18 +74,13 @@ const BASE_RETRY_INTERVAL = 3000; // Start with 3 seconds
 // Pending persistence queue
 let pendingPersist: Map<string, PersistedEntry> = new Map();
 
+// Storage key for cross-tab detection
+const STORAGE_KEY = 'diarum_diary_cache';
+
 /**
- * Initialize the diary cache system
+ * Reload cache from localStorage (for cross-tab sync)
  */
-export function initDiaryCache(): void {
-	if (!browser || initialized) return;
-	initialized = true;
-
-	// Initialize dependencies
-	initSyncConfig();
-	cleanupOnlineStatus = initOnlineStatus();
-
-	// Load persisted data
+function reloadFromStorage(): void {
 	const persisted = loadPersistedData();
 	const cache: DiaryCache = {};
 
@@ -96,6 +95,21 @@ export function initDiaryCache(): void {
 
 	diaryCache.set(cache);
 	updateCacheStats();
+}
+
+/**
+ * Initialize the diary cache system
+ */
+export function initDiaryCache(): void {
+	if (!browser || initialized) return;
+	initialized = true;
+
+	// Initialize dependencies
+	initSyncConfig();
+	cleanupOnlineStatus = initOnlineStatus();
+
+	// Load persisted data
+	reloadFromStorage();
 
 	// Clean up old entries on startup
 	const config = getConfig();
@@ -105,6 +119,14 @@ export function initDiaryCache(): void {
 	unsubscribeSyncConfig = syncConfig.subscribe(() => {
 		// Config changed, timer will use new interval on next schedule
 	});
+
+	// Listen for storage changes from other tabs
+	storageEventHandler = (e: StorageEvent) => {
+		if (e.key === STORAGE_KEY) {
+			reloadFromStorage();
+		}
+	};
+	window.addEventListener('storage', storageEventHandler);
 }
 
 /**
@@ -127,6 +149,10 @@ export function cleanupDiaryCache(): void {
 		unsubscribeSyncConfig();
 		unsubscribeSyncConfig = null;
 	}
+	if (storageEventHandler) {
+		window.removeEventListener('storage', storageEventHandler);
+		storageEventHandler = null;
+	}
 	// Flush any pending persistence
 	flushPendingPersist();
 	retryCount = 0;
@@ -138,9 +164,8 @@ export function cleanupDiaryCache(): void {
  */
 function flushPendingPersist(): void {
 	if (pendingPersist.size > 0) {
-		for (const entry of pendingPersist.values()) {
-			persistEntry(entry);
-		}
+		const entries = Array.from(pendingPersist.values());
+		persistEntries(entries);
 		pendingPersist.clear();
 	}
 }
@@ -554,10 +579,7 @@ export function clearCache(date: string): void {
  */
 export function clearAllCache(): void {
 	diaryCache.set({});
-	const persisted = getAllPersistedEntries();
-	for (const date of Object.keys(persisted)) {
-		removePersistedEntry(date);
-	}
+	clearAllPersistedData();
 	updateCacheStats();
 }
 
@@ -567,15 +589,17 @@ export function clearAllCache(): void {
 export function clearSyncedCache(): void {
 	const cache = get(diaryCache);
 	const newCache: DiaryCache = {};
+	const datesToRemove: string[] = [];
 
 	for (const [date, entry] of Object.entries(cache)) {
 		if (entry.isDirty) {
 			newCache[date] = entry;
 		} else {
-			removePersistedEntry(date);
+			datesToRemove.push(date);
 		}
 	}
 
+	removePersistedEntries(datesToRemove);
 	diaryCache.set(newCache);
 	updateCacheStats();
 }

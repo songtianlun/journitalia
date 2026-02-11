@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import {
 		cacheStats,
 		syncState,
@@ -14,7 +14,9 @@
 	let syncing = false;
 	let clearing = false;
 	let autoSaveSeconds = 3;
-	let cacheDaysValue = 3;
+	let cacheDaysValue = 30;
+	let refreshInterval: ReturnType<typeof setInterval> | null = null;
+	let tick = 0; // Used to force re-render for relative time updates
 
 	// Format relative time
 	function formatRelativeTime(timestamp: number): string {
@@ -70,13 +72,29 @@
 		runCacheCleanup();
 	}
 
+	// Refresh config from store and update tick for relative time
+	function refreshConfig() {
+		autoSaveSeconds = $syncConfig.autoSaveInterval / 1000;
+		cacheDaysValue = $syncConfig.cacheDays;
+		tick++; // Force re-render to update relative times
+	}
+
 	onMount(() => {
 		// initDiaryCache is idempotent, safe to call multiple times
 		initDiaryCache();
 
 		// Initialize from config
-		autoSaveSeconds = $syncConfig.autoSaveInterval / 1000;
-		cacheDaysValue = $syncConfig.cacheDays;
+		refreshConfig();
+
+		// Periodically refresh config and relative times (every 1 second for smoother updates)
+		refreshInterval = setInterval(refreshConfig, 1000);
+	});
+
+	onDestroy(() => {
+		if (refreshInterval) {
+			clearInterval(refreshInterval);
+			refreshInterval = null;
+		}
 	});
 
 	$: pendingEntries = $cacheStats.entries.filter(e => e.isDirty);

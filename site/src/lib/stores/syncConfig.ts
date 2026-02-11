@@ -10,7 +10,7 @@ export interface SyncConfig {
 
 const DEFAULT_CONFIG: SyncConfig = {
 	autoSaveInterval: 3000,
-	cacheDays: 3
+	cacheDays: 30
 };
 
 function loadConfig(): SyncConfig {
@@ -32,24 +32,39 @@ function loadConfig(): SyncConfig {
 
 export const syncConfig = writable<SyncConfig>(loadConfig());
 
+let configInitialized = false;
+let unsubscribeConfig: (() => void) | null = null;
+
 /**
  * Initialize sync config (call on app mount)
  */
 export function initSyncConfig(): void {
-	if (!browser) return;
+	if (!browser || configInitialized) return;
+	configInitialized = true;
 
 	// Load from localStorage
 	const config = loadConfig();
 	syncConfig.set(config);
 
 	// Subscribe to changes and persist
-	syncConfig.subscribe(config => {
+	unsubscribeConfig = syncConfig.subscribe(config => {
 		try {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 		} catch (e) {
 			console.error('Failed to save sync config:', e);
 		}
 	});
+}
+
+/**
+ * Cleanup sync config subscription
+ */
+export function cleanupSyncConfig(): void {
+	if (unsubscribeConfig) {
+		unsubscribeConfig();
+		unsubscribeConfig = null;
+	}
+	configInitialized = false;
 }
 
 /**
