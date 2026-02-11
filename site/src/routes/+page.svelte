@@ -101,263 +101,79 @@
 			</div>
 		</section>
 
-		<!-- Demo Screenshot Section -->
+		<!-- Screenshots Section -->
 		<section class="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
-			<div class="max-w-6xl mx-auto">
-				<!-- Desktop: Side by side layout -->
-				<div class="hidden lg:grid lg:grid-cols-5 gap-6">
-					<!-- Main Editor Panel (3 cols) -->
-					<div class="col-span-3 bg-card rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
-						<!-- Window Chrome -->
-						<div class="bg-secondary/30 px-4 py-3 border-b border-border/50 flex items-center gap-3">
-							<div class="flex items-center gap-1.5">
-								<div class="w-3 h-3 rounded-full bg-red-400/80"></div>
-								<div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
-								<div class="w-3 h-3 rounded-full bg-green-400/80"></div>
-							</div>
-							<span class="flex-1 text-center text-xs text-muted-foreground font-medium">Diarum</span>
-						</div>
-						<!-- Editor Content -->
-						<div class="p-6">
-							<!-- Date Header -->
-							<div class="flex items-center justify-between mb-6">
-								<div class="flex items-center gap-3">
-									<button class="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" aria-label="Previous day">
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-										</svg>
-									</button>
-									<div>
-										<h2 class="text-xl font-semibold text-foreground">February 1, 2026</h2>
-										<p class="text-xs text-muted-foreground">Sunday</p>
-									</div>
-								</div>
-								<div class="flex items-center gap-2">
-									<span class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-										<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-										Saved
-									</span>
-								</div>
-							</div>
-							<!-- Toolbar -->
-							<div class="flex items-center gap-1 p-2 bg-muted/30 rounded-lg mb-4">
-								<button class="p-1.5 rounded hover:bg-muted text-muted-foreground" aria-label="Bold"><span class="font-bold text-sm">B</span></button>
-								<button class="p-1.5 rounded hover:bg-muted text-muted-foreground" aria-label="Italic"><span class="italic text-sm">I</span></button>
-								<button class="p-1.5 rounded hover:bg-muted text-muted-foreground" aria-label="Underline"><span class="underline text-sm">U</span></button>
-								<div class="w-px h-4 bg-border mx-1"></div>
-								<button class="p-1.5 rounded hover:bg-muted text-muted-foreground" aria-label="List">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-									</svg>
-								</button>
-								<button class="p-1.5 rounded hover:bg-muted text-muted-foreground" aria-label="Image">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-									</svg>
-								</button>
-							</div>
-							<!-- Editor Text -->
-							<div class="prose prose-sm text-foreground leading-relaxed space-y-3">
-								<p>Today was a <strong>productive day</strong>. I finally finished the project I've been working on for the past week. It feels great to see it come together.</p>
-								<p>In the afternoon, I took a long walk in the park. The weather was perfect - sunny but not too hot. I noticed the cherry blossoms are starting to bloom. 🌸</p>
-								<p>Things I'm grateful for today:</p>
-								<ul class="list-disc list-inside space-y-1 text-muted-foreground">
-									<li>Completing my project on time</li>
-									<li>The beautiful weather</li>
-									<li>A good conversation with Mom</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-
-					<!-- Side Panels (2 cols) -->
-					<div class="col-span-2 space-y-6">
-						<!-- Calendar Panel -->
-						<div class="bg-card rounded-2xl border border-border/50 shadow-xl overflow-hidden">
-							<div class="bg-secondary/30 px-4 py-2.5 border-b border-border/50">
-								<span class="text-sm font-medium text-foreground">February 2026</span>
-							</div>
-							<div class="p-4">
-								<!-- Calendar Grid -->
-								<div class="grid grid-cols-7 gap-1 text-center text-xs mb-2">
-									<span class="text-muted-foreground">Su</span>
-									<span class="text-muted-foreground">Mo</span>
-									<span class="text-muted-foreground">Tu</span>
-									<span class="text-muted-foreground">We</span>
-									<span class="text-muted-foreground">Th</span>
-									<span class="text-muted-foreground">Fr</span>
-									<span class="text-muted-foreground">Sa</span>
-								</div>
-								<div class="grid grid-cols-7 gap-1 text-center text-xs">
-									<span class="p-1.5 bg-primary text-primary-foreground rounded-lg font-medium">1</span>
-									<span class="p-1.5 text-muted-foreground">2</span>
-									<span class="p-1.5 text-muted-foreground">3</span>
-									<span class="p-1.5 text-muted-foreground">4</span>
-									<span class="p-1.5 text-muted-foreground">5</span>
-									<span class="p-1.5 text-muted-foreground">6</span>
-									<span class="p-1.5 text-muted-foreground">7</span>
-									{#each [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28] as day}
-										<span class="p-1.5 text-muted-foreground relative">
-											{day}
-											{#if [9,10,12,15,18,19,22,25,27].includes(day)}
-												<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary/60"></span>
-											{/if}
-										</span>
-									{/each}
-								</div>
-								<!-- Stats -->
-								<div class="mt-4 pt-3 border-t border-border/50 flex justify-between text-xs">
-									<div class="text-center">
-										<div class="text-lg font-semibold text-foreground">12</div>
-										<div class="text-muted-foreground">Entries</div>
-									</div>
-									<div class="text-center">
-										<div class="text-lg font-semibold text-foreground">5</div>
-										<div class="text-muted-foreground">Streak</div>
-									</div>
-									<div class="text-center">
-										<div class="text-lg font-semibold text-foreground">2.4k</div>
-										<div class="text-muted-foreground">Words</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Quick AI Chat -->
-						<div class="bg-card rounded-2xl border border-border/50 shadow-xl overflow-hidden">
-							<div class="bg-secondary/30 px-4 py-2.5 border-b border-border/50 flex items-center gap-2">
-								<span class="text-sm">🤖</span>
-								<span class="text-sm font-medium text-foreground">AI Assistant</span>
-							</div>
-							<div class="p-3 space-y-2.5">
-								<div class="bg-muted/50 rounded-lg p-2.5">
-									<p class="text-xs text-foreground">I noticed you mentioned feeling grateful today. That's wonderful! Would you like me to help you track your gratitude patterns?</p>
-								</div>
-								<div class="flex gap-2">
-									<input type="text" placeholder="Ask anything..." class="flex-1 text-xs px-3 py-2 bg-background border border-border rounded-lg" disabled />
-									<button class="p-2 bg-primary text-primary-foreground rounded-lg" aria-label="Send message">
-										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-										</svg>
-									</button>
-								</div>
-							</div>
-						</div>
+			<div class="max-w-7xl mx-auto">
+				<!-- Desktop Screenshots -->
+				<div class="hidden md:block mb-12 animate-fade-in">
+					<div class="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
+						<!-- Light Mode Screenshot -->
+						<img
+							src="/screenshots/desktop-light.png"
+							alt="Diarum Desktop Interface"
+							class="w-full h-auto dark:hidden"
+							loading="lazy"
+						/>
+						<!-- Dark Mode Screenshot -->
+						<img
+							src="/screenshots/desktop-dark.png"
+							alt="Diarum Desktop Interface"
+							class="w-full h-auto hidden dark:block"
+							loading="lazy"
+						/>
 					</div>
 				</div>
 
-				<!-- Tablet: Stacked layout -->
-				<div class="hidden md:block lg:hidden space-y-6">
-					<!-- Editor Panel -->
-					<div class="bg-card rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
-						<div class="bg-secondary/30 px-4 py-3 border-b border-border/50 flex items-center gap-3">
-							<div class="flex items-center gap-1.5">
-								<div class="w-3 h-3 rounded-full bg-red-400/80"></div>
-								<div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
-								<div class="w-3 h-3 rounded-full bg-green-400/80"></div>
-							</div>
-							<span class="flex-1 text-center text-xs text-muted-foreground font-medium">Diarum</span>
-						</div>
-						<div class="p-6">
-							<div class="flex items-center justify-between mb-4">
-								<div>
-									<h2 class="text-lg font-semibold text-foreground">February 1, 2026</h2>
-									<p class="text-xs text-muted-foreground">Sunday</p>
-								</div>
-								<span class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-									<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-									Saved
-								</span>
-							</div>
-							<div class="prose prose-sm text-foreground leading-relaxed">
-								<p>Today was a <strong>productive day</strong>. I finally finished the project I've been working on for the past week.</p>
-								<p>In the afternoon, I took a long walk in the park. The cherry blossoms are starting to bloom. 🌸</p>
-							</div>
-						</div>
-					</div>
-					<!-- Calendar + AI Row -->
-					<div class="grid grid-cols-2 gap-4">
-						<div class="bg-card rounded-xl border border-border/50 shadow-lg p-4">
-							<div class="text-sm font-medium text-foreground mb-3">February 2026</div>
-							<div class="grid grid-cols-7 gap-0.5 text-center text-[10px]">
-								{#each ['S','M','T','W','T','F','S'] as d}
-									<span class="text-muted-foreground">{d}</span>
-								{/each}
-								{#each Array(28) as _, i}
-									<span class="p-1 {i+1 === 1 ? 'bg-primary text-primary-foreground rounded' : 'text-muted-foreground'}">{i+1}</span>
-								{/each}
-							</div>
-						</div>
-						<div class="bg-card rounded-xl border border-border/50 shadow-lg p-4">
-							<div class="flex items-center gap-2 mb-3">
-								<span>🤖</span>
-								<span class="text-sm font-medium text-foreground">AI Assistant</span>
-							</div>
-							<p class="text-xs text-muted-foreground">Ask me about your entries, mood patterns, or get writing prompts...</p>
-						</div>
+				<!-- Mobile Screenshots -->
+				<div class="md:hidden mb-8 animate-fade-in">
+					<div class="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 max-w-sm mx-auto">
+						<!-- Light Mode Screenshot -->
+						<img
+							src="/screenshots/mobile-light.png"
+							alt="Diarum Mobile Interface"
+							class="w-full h-auto dark:hidden"
+							loading="lazy"
+						/>
+						<!-- Dark Mode Screenshot -->
+						<img
+							src="/screenshots/mobile-dark.png"
+							alt="Diarum Mobile Interface"
+							class="w-full h-auto hidden dark:block"
+							loading="lazy"
+						/>
 					</div>
 				</div>
 
-				<!-- Mobile: Single column -->
-				<div class="md:hidden">
-					<div class="bg-card rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
-						<div class="bg-secondary/30 px-3 py-2.5 border-b border-border/50 flex items-center justify-between">
-							<div class="flex items-center gap-1.5">
-								<div class="w-2.5 h-2.5 rounded-full bg-red-400/80"></div>
-								<div class="w-2.5 h-2.5 rounded-full bg-yellow-400/80"></div>
-								<div class="w-2.5 h-2.5 rounded-full bg-green-400/80"></div>
-							</div>
-							<span class="text-xs text-muted-foreground font-medium">Diarum</span>
-							<div class="w-12"></div>
+				<!-- Feature Highlights -->
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+					<div class="text-center p-6 bg-card/50 rounded-xl border border-border/30">
+						<div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
+							<svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+							</svg>
 						</div>
-						<div class="p-4">
-							<div class="flex items-center justify-between mb-3">
-								<div>
-									<h2 class="text-base font-semibold text-foreground">Feb 1, 2026</h2>
-									<p class="text-[10px] text-muted-foreground">Sunday</p>
-								</div>
-								<span class="text-[10px] text-green-600 dark:text-green-400">Saved</span>
-							</div>
-							<div class="text-sm text-foreground leading-relaxed space-y-2">
-								<p>Today was a <strong>productive day</strong>. I finally finished the project! 🎉</p>
-								<p>Took a walk in the park - the cherry blossoms are blooming. 🌸</p>
-							</div>
-							<!-- Bottom Nav Mock -->
-							<div class="mt-4 pt-3 border-t border-border/50 flex justify-around">
-								<div class="text-center">
-									<div class="w-8 h-8 mx-auto rounded-lg bg-primary/10 flex items-center justify-center mb-1">
-										<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-										</svg>
-									</div>
-									<span class="text-[10px] text-primary font-medium">Write</span>
-								</div>
-								<div class="text-center">
-									<div class="w-8 h-8 mx-auto rounded-lg bg-muted flex items-center justify-center mb-1">
-										<svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-										</svg>
-									</div>
-									<span class="text-[10px] text-muted-foreground">Calendar</span>
-								</div>
-								<div class="text-center">
-									<div class="w-8 h-8 mx-auto rounded-lg bg-muted flex items-center justify-center mb-1">
-										<svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-										</svg>
-									</div>
-									<span class="text-[10px] text-muted-foreground">AI</span>
-								</div>
-								<div class="text-center">
-									<div class="w-8 h-8 mx-auto rounded-lg bg-muted flex items-center justify-center mb-1">
-										<svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-										</svg>
-									</div>
-									<span class="text-[10px] text-muted-foreground">Search</span>
-								</div>
-							</div>
+						<h3 class="font-semibold text-foreground mb-2">Beautiful Editor</h3>
+						<p class="text-sm text-muted-foreground">Rich text formatting with an intuitive, distraction-free interface</p>
+					</div>
+
+					<div class="text-center p-6 bg-card/50 rounded-xl border border-border/30">
+						<div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
+							<svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+							</svg>
 						</div>
+						<h3 class="font-semibold text-foreground mb-2">Smart Calendar</h3>
+						<p class="text-sm text-muted-foreground">Track your writing streaks and navigate entries effortlessly</p>
+					</div>
+
+					<div class="text-center p-6 bg-card/50 rounded-xl border border-border/30">
+						<div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center">
+							<svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+							</svg>
+						</div>
+						<h3 class="font-semibold text-foreground mb-2">Responsive Design</h3>
+						<p class="text-sm text-muted-foreground">Perfect experience on desktop, tablet, and mobile devices</p>
 					</div>
 				</div>
 
