@@ -123,6 +123,8 @@ export function initDiaryCache(): void {
 	// Listen for storage changes from other tabs
 	storageEventHandler = (e: StorageEvent) => {
 		if (e.key === STORAGE_KEY) {
+			// Flush pending writes before reloading to avoid data loss
+			flushPendingPersist();
 			reloadFromStorage();
 		}
 	};
