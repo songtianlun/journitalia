@@ -626,3 +626,129 @@ export function runCacheCleanup(): number {
 
 	return removed;
 }
+
+// Pre-cache state
+export const preCacheState = writable<{
+	isRunning: boolean;
+	progress: number;
+	total: number;
+	message: string;
+}>({
+	isRunning: false,
+	progress: 0,
+	total: 0,
+	message: ''
+});
+
+/**
+ * Pre-cache diaries for the configured cache duration
+ */
+export async function preCacheDiaries(): Promise<{ success: boolean; cached: number }> {
+	const config = getConfig();
+	const cacheDays = config.cacheDays;
+
+	// Calculate date range
+	const today = new Date();
+	const startDate = new Date(today);
+	startDate.setDate(startDate.getDate() - cacheDays + 1);
+
+	const formatDate = (d: Date) => d.toISOString().split('T')[0];
+	const start = formatDate(startDate);
+	const end = formatDate(today);
+
+	preCacheState.set({
+		isRunning: true,
+		progress: 0,
+		total: 0,
+		message: 'Fetching diary list...'
+	});
+
+	try {
+		// Check online status
+		const online = await checkOnlineStatus();
+		if (!online) {
+			preCacheState.set({
+				isRunning: false,
+				progress: 0,
+				total: 0,
+				message: 'Offline'
+			});
+			return { success: false, cached: 0 };
+		}
+
+		// Get dates with diaries in range
+		const { getDatesWithDiaries, getDiaryByDate } = await import('$lib/api/diaries');
+		const datesWithDiaries = await getDatesWithDiaries(start, end);
+
+		if (datesWithDiaries.length === 0) {
+			preCacheState.set({
+				isRunning: false,
+				progress: 0,
+				total: 0,
+				message: 'No diaries to cache'
+			});
+			return { success: true, cached: 0 };
+		}
+
+		// Filter out dates already in cache (not dirty)
+		const cache = get(diaryCache);
+		const datesToFetch = datesWithDiaries.filter(date => {
+			const entry = cache[date];
+			return !entry || entry.isDirty === false; // Re-fetch synced entries to ensure fresh
+		});
+
+		preCacheState.set({
+			isRunning: true,
+			progress: 0,
+			total: datesToFetch.length,
+			message: `Caching 0/${datesToFetch.length}...`
+		});
+
+		let cached = 0;
+		for (const date of datesToFetch) {
+			try {
+				const diary = await getDiaryByDate(date);
+				if (diary) {
+					updateFromServer(date, diary);
+					cached++;
+				}
+				preCacheState.set({
+					isRunning: true,
+					progress: cached,
+					total: datesToFetch.length,
+					message: `Caching ${cached}/${datesToFetch.length}...`
+				});
+			} catch (error) {
+				console.error(`Failed to pre-cache diary for ${date}:`, error);
+			}
+		}
+
+		preCacheState.set({
+			isRunning: false,
+			progress: cached,
+			total: datesToFetch.length,
+			message: `Cached ${cached} entries`
+		});
+
+		// Clear message after 3 seconds
+		setTimeout(() => {
+			preCacheState.update(s => {
+				if (!s.isRunning) {
+					return { ...s, message: '' };
+				}
+				return s;
+			});
+		}, 3000);
+
+		return { success: true, cached };
+	} catch (error) {
+		console.error('Pre-cache failed:', error);
+		preCacheState.set({
+			isRunning: false,
+			progress: 0,
+			total: 0,
+			message: 'Pre-cache failed'
+		});
+		return { success: false, cached: 0 };
+	}
+}
