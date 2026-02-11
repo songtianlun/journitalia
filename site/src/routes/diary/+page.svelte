@@ -76,7 +76,10 @@
 	<header class="glass border-b border-border/50 sticky top-0 z-20">
 		<div class="max-w-6xl mx-auto px-4 h-11">
 			<div class="flex items-center justify-between h-full">
-				<a href="/" class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</a>
+				<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+					<img src="/logo.png" alt="Diarum" class="w-6 h-6" />
+					<span class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
+				</a>
 
 				<div class="flex items-center gap-2">
 					<a href="/media" class="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-200" title="Media Library">

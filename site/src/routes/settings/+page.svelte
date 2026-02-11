@@ -310,7 +310,10 @@
 			<div class="max-w-6xl mx-auto px-4 h-11">
 				<div class="flex items-center justify-between h-full">
 					<!-- Left: Brand -->
-					<a href="/" class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</a>
+					<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+						<img src="/logo.png" alt="Diarum" class="w-6 h-6" />
+						<span class="text-lg font-semibold text-foreground hover:text-primary transition-colors">Diarum</span>
+					</a>
 
 					<!-- Center: Title -->
 					<div class="text-sm font-medium text-foreground">Settings</div>

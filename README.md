@@ -1,5 +1,9 @@
 # Diarum
 
+<p align="center">
+  <img src="site/static/logo.png" alt="Diarum Logo" width="120" />
+</p>
+
 [English](#english) | [中文](#中文)
 
 ---

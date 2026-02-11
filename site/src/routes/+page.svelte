@@ -60,6 +60,7 @@
 			<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex items-center justify-between h-16">
 					<div class="flex items-center gap-2">
+						<img src="/logo.png" alt="Diarum" class="w-8 h-8" />
 						<span class="text-2xl font-bold text-foreground">Diarum</span>
 					</div>
 					<a

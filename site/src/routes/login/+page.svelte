@@ -64,6 +64,7 @@
 	<div class="flex-1 flex items-center justify-center p-4">
 		<div class="w-full max-w-md animate-fade-in">
 			<div class="text-center mb-8">
+				<img src="/logo.png" alt="Diarum" class="w-16 h-16 mx-auto mb-4" />
 				<h1 class="text-3xl font-bold text-foreground mb-2">Diarum</h1>
 				<p class="text-muted-foreground text-sm">Your personal diary</p>
 			</div>
