@@ -59,7 +59,7 @@ async function registerServiceWorker() {
 		updateSW = registerSW({
 			immediate: true,
 			onNeedRefresh() {
-				// Only show update prompt if SW was already registered before
+				// Only show update prompt if SW was already registered before (not on first visit)
 				if (hasExistingSW) {
 					isUpdateAvailable.set(true);
 					console.log('PWA: New content available, refresh needed');
