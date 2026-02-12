@@ -53,16 +53,16 @@ async function registerServiceWorker() {
 	try {
 		const { registerSW } = await import('virtual:pwa-register');
 
-		// Check if this is the first SW registration
-		const hasExistingSW = await navigator.serviceWorker.getRegistration();
-
 		updateSW = registerSW({
 			immediate: true,
 			onNeedRefresh() {
-				// Only show update prompt if SW was already registered before (not on first visit)
-				if (hasExistingSW) {
+				// Only show update prompt in standalone PWA mode
+				// In browser, user can simply refresh to get updates
+				if (isStandalone()) {
 					isUpdateAvailable.set(true);
 					console.log('PWA: New content available, refresh needed');
+				} else {
+					console.log('PWA: New content available (browser mode, no prompt)');
 				}
 			},
 			onOfflineReady() {
@@ -168,16 +168,21 @@ export function listenForUpdates() {
 	if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
 	navigator.serviceWorker.addEventListener('controllerchange', () => {
-		isUpdateAvailable.set(true);
+		// Only show update prompt in standalone PWA mode
+		if (isStandalone()) {
+			isUpdateAvailable.set(true);
+		}
 	});
 
-	// Check for updates every 60 minutes
-	setInterval(
-		() => {
-			checkForUpdates();
-		},
-		60 * 60 * 1000
-	);
+	// Check for updates every 60 minutes (only in standalone mode)
+	if (isStandalone()) {
+		setInterval(
+			() => {
+				checkForUpdates();
+			},
+			60 * 60 * 1000
+		);
+	}
 }
 
 // Reload to apply updates

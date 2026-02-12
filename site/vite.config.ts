@@ -51,14 +51,14 @@ export default defineConfig({
 				screenshots: [
 					{
 						src: '/screenshots/mobile-light.png',
-						sizes: '930x1734',
+						sizes: '920x1730',
 						type: 'image/png',
 						form_factor: 'narrow',
 						label: 'Mobile view - Light theme'
 					},
 					{
 						src: '/screenshots/mobile-dark.png',
-						sizes: '924x1734',
+						sizes: '920x1730',
 						type: 'image/png',
 						form_factor: 'narrow',
 						label: 'Mobile view - Dark theme'
@@ -72,7 +72,7 @@ export default defineConfig({
 					},
 					{
 						src: '/screenshots/desktop-dark.png',
-						sizes: '2544x2018',
+						sizes: '2522x2012',
 						type: 'image/png',
 						form_factor: 'wide',
 						label: 'Desktop view - Dark theme'
