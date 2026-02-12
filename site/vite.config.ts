@@ -150,6 +150,9 @@ export default defineConfig({
 				target: 'http://localhost:8090',
 				changeOrigin: true
 			}
-		}
+		},
+		allowedHosts: [
+			'f316-124-244-250-14.ngrok-free.app'
+		]
 	}
 });
