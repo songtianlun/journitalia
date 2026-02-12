@@ -5,6 +5,7 @@
 	export let currentYear: number;
 	export let currentMonth: number;
 	export let datesWithDiaries: string[] = [];
+	export let dateStatuses: Record<string, 'online' | 'cached' | 'pending'> = {};
 
 	const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const monthNames = [
@@ -25,6 +26,11 @@
 
 	function hasDiary(date: Date): boolean {
 		return datesWithDiaries.includes(formatDate(date));
+	}
+
+	function getDateStatus(date: Date): 'online' | 'cached' | 'pending' | null {
+		const dateStr = formatDate(date);
+		return dateStatuses[dateStr] || null;
 	}
 
 	function handleDateClick(date: Date) {
@@ -102,23 +108,49 @@
 	<!-- Calendar Days -->
 	<div class="grid grid-cols-7 gap-2">
 		{#each calendarDays as date, i}
+			{@const status = getDateStatus(date)}
+			{@const hasEntry = hasDiary(date)}
+			{@const today = isToday(date)}
 			<button
 				on:click={() => handleDateClick(date)}
 				class="day aspect-square rounded-lg transition-all duration-200 flex flex-col items-center justify-center relative
 					   {isCurrentMonth(date) ? 'text-foreground' : 'text-muted-foreground/40'}
-					   {isToday(date) ? 'bg-primary/10 ring-2 ring-primary font-semibold' : ''}
-					   {hasDiary(date) && !isToday(date) ? 'bg-amber-500/10 dark:bg-amber-500/20' : ''}
-					   {!isToday(date) && !hasDiary(date) ? 'hover:bg-muted/50' : ''}
-					   {hasDiary(date) && !isToday(date) ? 'hover:bg-amber-500/20 dark:hover:bg-amber-500/30' : ''}"
+					   {today ? 'bg-primary/10 ring-2 ring-primary font-semibold' : ''}
+					   {hasEntry && !today && status === 'online' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 hover:bg-emerald-500/20 dark:hover:bg-emerald-500/30' : ''}
+					   {hasEntry && !today && status === 'cached' ? 'bg-sky-500/10 dark:bg-sky-500/20 hover:bg-sky-500/20 dark:hover:bg-sky-500/30' : ''}
+					   {hasEntry && !today && status === 'pending' ? 'bg-amber-500/10 dark:bg-amber-500/20 hover:bg-amber-500/20 dark:hover:bg-amber-500/30' : ''}
+					   {!today && !hasEntry ? 'hover:bg-muted/50' : ''}"
 				style="animation-delay: {i * 10}ms"
 			>
 				<span class="text-sm">{date.getDate()}</span>
-				{#if hasDiary(date)}
-					<span class="absolute bottom-1 w-1 h-1 bg-amber-500 rounded-full"></span>
+				{#if hasEntry}
+					<span class="absolute bottom-1 w-1.5 h-1.5 rounded-full
+						{status === 'online' ? 'bg-emerald-500' : ''}
+						{status === 'cached' ? 'bg-sky-500' : ''}
+						{status === 'pending' ? 'bg-amber-500' : ''}
+					"></span>
 				{/if}
 			</button>
 		{/each}
 	</div>
+
+	<!-- Legend -->
+	{#if Object.keys(dateStatuses).length > 0}
+		<div class="mt-4 pt-3 border-t border-border/50 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+			<div class="flex items-center gap-1.5">
+				<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+				<span>Synced</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<span class="w-2 h-2 rounded-full bg-sky-500"></span>
+				<span>Cached</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+				<span>Pending</span>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
