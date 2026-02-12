@@ -47,7 +47,7 @@
 
 <!-- Standard install prompt (Chrome/Edge/Android) -->
 {#if showPrompt}
-	<div class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-up">
+	<div class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[100] animate-slide-up">
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
 			<div class="flex items-start gap-3">
 				<div class="flex-shrink-0">
@@ -95,7 +95,7 @@
 
 <!-- iOS install guide -->
 {#if showIOSGuide && isIOSDevice}
-	<div class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-up">
+	<div class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[100] animate-slide-up">
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
 			<div class="flex items-start gap-3">
 				<div class="flex-shrink-0">
