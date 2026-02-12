@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { canInstall, installPWA, isIOS, showIOSInstallGuide, dismissIOSGuide, isUpdateAvailable } from '$lib/utils/pwa';
+	import {
+		canInstall,
+		installPWA,
+		isIOS,
+		showIOSInstallGuide,
+		dismissIOSGuide,
+		isUpdateAvailable
+	} from '$lib/utils/pwa';
 	import { onMount } from 'svelte';
 
 	let showPrompt = false;
@@ -9,7 +16,6 @@
 	let installing = false;
 
 	onMount(() => {
-		const unsubscribeCanInstall = canInstall.subscribe((value) => {
 		const unsubscribeCanInstall = canInstall.subscribe((value) => {
 			showPrompt = value;
 		});
@@ -45,10 +51,6 @@
 
 	function dismiss() {
 		showPrompt = false;
-	}
-
-	function dismissIOS(remember = false) {
-		dismissIOSGuide(remember);
 	}
 
 	function dismissIOS(remember = false) {

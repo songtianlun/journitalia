@@ -1,8 +1,6 @@
 // PWA utility functions
 import { writable, get } from 'svelte/store';
 import { browser } from '$app/environment';
-import { writable, get } from 'svelte/store';
-import { browser } from '$app/environment';
 
 interface BeforeInstallPromptEvent extends Event {
 	prompt(): Promise<void>;
@@ -27,7 +25,8 @@ export function detectPlatform() {
 	if (typeof window === 'undefined') return;
 
 	const ua = window.navigator.userAgent;
-	const isIOSDevice = /iPad|iPhone|iPod/.test(ua) ||
+	const isIOSDevice =
+		/iPad|iPhone|iPod/.test(ua) ||
 		(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 	const isAndroidDevice = /Android/.test(ua);
 
@@ -41,8 +40,10 @@ export function detectPlatform() {
 export function isStandalone() {
 	if (typeof window === 'undefined') return false;
 
-	return window.matchMedia('(display-mode: standalone)').matches ||
-		(window.navigator as any).standalone === true;
+	return (
+		window.matchMedia('(display-mode: standalone)').matches ||
+		(window.navigator as any).standalone === true
+	);
 }
 
 // Register Service Worker
@@ -58,8 +59,7 @@ async function registerServiceWorker() {
 		updateSW = registerSW({
 			immediate: true,
 			onNeedRefresh() {
-				// Only show update prompt if SW was already registered before
-				// (not on first visit)
+				// Only show update prompt if SW was already registered before (not on first visit)
 				if (hasExistingSW) {
 					isUpdateAvailable.set(true);
 					console.log('PWA: New content available, refresh needed');
@@ -96,18 +96,6 @@ export function initPWA() {
 	}
 
 	// Listen for beforeinstallprompt event (Chrome/Edge/Android)
-	const platform = detectPlatform();
-
-	// Register Service Worker
-	registerServiceWorker();
-
-	// If already installed as standalone, don't show install prompts
-	if (isStandalone()) {
-		canInstall.set(false);
-		return;
-	}
-
-	// Listen for beforeinstallprompt event (Chrome/Edge/Android)
 	window.addEventListener('beforeinstallprompt', (e) => {
 		e.preventDefault();
 		deferredPrompt.set(e as BeforeInstallPromptEvent);
@@ -119,13 +107,11 @@ export function initPWA() {
 		deferredPrompt.set(null);
 		canInstall.set(false);
 		showIOSInstallGuide.set(false);
-		showIOSInstallGuide.set(false);
 		console.log('PWA installed successfully');
 	});
 
 	// For iOS, show install guide after a delay (since beforeinstallprompt won't fire)
 	if (platform?.isIOS) {
-		// Check if user has dismissed the guide before
 		const dismissed = localStorage.getItem('pwa-ios-guide-dismissed');
 		if (!dismissed) {
 			setTimeout(() => {
@@ -186,9 +172,12 @@ export function listenForUpdates() {
 	});
 
 	// Check for updates every 60 minutes
-	setInterval(() => {
-		checkForUpdates();
-	}, 60 * 60 * 1000);
+	setInterval(
+		() => {
+			checkForUpdates();
+		},
+		60 * 60 * 1000
+	);
 }
 
 // Reload to apply updates
