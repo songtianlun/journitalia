@@ -23,7 +23,7 @@
 </script>
 
 {#if showUpdate}
-	<div class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-down">
+	<div class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[100] animate-slide-up">
 		<div class="bg-blue-50 dark:bg-blue-900 rounded-lg shadow-lg p-4 border border-blue-200 dark:border-blue-700">
 			<div class="flex items-start gap-3">
 				<div class="flex-shrink-0">
@@ -69,9 +69,9 @@
 {/if}
 
 <style>
-	@keyframes slide-down {
+	@keyframes slide-up {
 		from {
-			transform: translateY(-100%);
+			transform: translateY(100%);
 			opacity: 0;
 		}
 		to {
@@ -80,7 +80,7 @@
 		}
 	}
 
-	.animate-slide-down {
-		animation: slide-down 0.3s ease-out;
+	.animate-slide-up {
+		animation: slide-up 0.3s ease-out;
 	}
 </style>
